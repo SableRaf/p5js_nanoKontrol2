@@ -1,7 +1,4 @@
-// nanoKONTROL2 → sketch parameters (WebMidi.js v3)
-// A minimal starting point: connects to the controller, maps every control
-// to a friendly name, and reads them in draw(). No debug log / visualization —
-// replace the demo drawing with your own.
+// nanoKONTROL2 → sketch parameters using WebMidi.js v3
 
 let playing = false;
 
