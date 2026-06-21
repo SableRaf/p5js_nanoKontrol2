@@ -214,10 +214,19 @@ class MidiController {
   }
 
   // Turn a button LED on (true) or off (false) by control name.
+  // Note: external LED control only works when the nanoKONTROL2's LED Mode is
+  // set to "External" (via the KORG Kontrol Editor). In the default "Internal"
+  // mode the unit drives its own LEDs and ignores these messages.
   setLed(name, on) {
-    if (!this._output) return;
+    if (!this._output) {
+      if (this._debugLogs) console.warn(`[nanokontrol2] setLed(${name}): no MIDI output port found`);
+      return;
+    }
     const cc = this._nameToCC[name];
-    if (cc === undefined) return;
+    if (cc === undefined) {
+      if (this._debugLogs) console.warn(`[nanokontrol2] setLed: unknown control "${name}"`);
+      return;
+    }
     this._output.sendControlChange(cc, on ? 127 : 0);
   }
 
@@ -246,7 +255,9 @@ class MidiController {
 
   // Read a control's value by name. Returns smoothed value when enabled,
   // normalized to 0..1 unless the control (or global mode) is RAW.
-  getValue(name, { defaultValue } = {}) {
+  // Pass { smoothed: false } to read the immediate (target) value, ignoring
+  // smoothing — used when dispatching events.
+  getValue(name, { defaultValue, smoothed = true } = {}) {
     const cc = this._nameToCC[name];
     if (cc === undefined) return 0;
 
@@ -255,8 +266,11 @@ class MidiController {
       : this._defaultValue;
 
     const smooth = this._smoothFor(name);
-    const raw = smooth.enabled
-      ? (this._smoothed[cc] ?? fallback)
+    // When smoothing is enabled but the smoothed value hasn't been initialized
+    // yet (no predraw tick has run for this control), fall back to the latest
+    // raw value rather than the global default so polling never reads stale 0s.
+    const raw = (smoothed && smooth.enabled)
+      ? (this._smoothed[cc] ?? this._values[cc] ?? fallback)
       : (this._values[cc] ?? fallback);
 
     const isRaw = this._rawGlobal || this._rawMode[cc];
@@ -275,14 +289,18 @@ class MidiController {
     this._values[cc] = rawValue;
 
     this.input = ctrl.name;
-    this.value = this.getValue(ctrl.name);
 
     const actions = this._p5 ? this._p5._customActions : null;
     if (!actions) return;
 
     if (ctrl.type === 'continuous') {
+      // Report the immediate target value to the callback. When smoothing is
+      // enabled, _interpolate() re-fires inputChanged each frame with the
+      // smoothed value until the control settles.
+      this.value = this.getValue(ctrl.name, { smoothed: false });
       if (typeof actions.inputChanged === 'function') actions.inputChanged.call(this._p5);
     } else {
+      this.value = this.getValue(ctrl.name, { smoothed: false });
       const prev = this._prevValues[cc] ?? 0;
       if (rawValue > 0 && prev === 0) {
         if (typeof actions.buttonPressed === 'function') actions.buttonPressed.call(this._p5);
@@ -294,18 +312,33 @@ class MidiController {
 
   // Advance all smoothed values one step toward their targets.
   // Called automatically each frame via the `predraw` lifecycle hook.
+  // While a continuous control is still settling, re-fires inputChanged so
+  // callback-driven sketch state tracks the smoothed value frame by frame.
   _interpolate() {
+    const actions = this._p5 ? this._p5._customActions : null;
     for (const [cc, ctrl] of Object.entries(this._ccMap)) {
       const smooth = this._smoothFor(ctrl.name);
       if (!smooth.enabled) continue;
-      const ease = EASING[smooth.easingType] ?? EASING.lerp;
-      const t = ease(durationToSpeed(smooth.duration));
+
       const target = this._values[cc] ?? this._defaultValue;
       const current = this._smoothed[cc] ?? this._defaultValue;
+      if (Math.abs(target - current) < 1e-3) {
+        this._smoothed[cc] = target;
+        continue; // settled — nothing to advance or re-dispatch
+      }
+
+      const ease = EASING[smooth.easingType] ?? EASING.lerp;
+      const t = ease(durationToSpeed(smooth.duration));
       this._smoothed[cc] = current + (target - current) * t;
+
+      // Re-dispatch inputChanged for continuous controls so callbacks that
+      // read midi.value keep tracking the smoothed value.
+      if (ctrl.type === 'continuous' && actions && typeof actions.inputChanged === 'function') {
+        this.input = ctrl.name;
+        this.value = this.getValue(ctrl.name);
+        actions.inputChanged.call(this._p5);
+      }
     }
-    // Keep `value` in sync with the smoothed reading of the last input.
-    if (this.input !== null) this.value = this.getValue(this.input);
   }
 
   // --- Internal: WebMidi wiring ------------------------------------------
@@ -401,19 +434,28 @@ function nanoKontrol2Addon(p5, fn, lifecycles) {
   // Expose the generic engine for power users defining custom controllers.
   fn.MidiController = MidiController;
 
-  // Device-specific class. `this` inside is the p5 sketch instance; capture it
-  // so the controller can reach `_customActions` and so `predraw` can find it.
+  // Device-specific class. We must store state on the live p5 instance so the
+  // controller can reach `_customActions` and `predraw` can find the controller.
+  // In global mode `this` is `window` (p5 calls setup() as window.setup()), not
+  // the p5 instance — so fall back to the static `p5.instance` in that case.
   // options — { debugLogs } to log raw MIDI events to the console.
   fn.NanoKontrol2 = function (options = {}) {
+    const sketch = (this instanceof p5) ? this : p5.instance;
     const controller = new MidiController(NANOKONTROL2_DEF, options);
-    controller._p5 = this;
-    this._nanoKontrol2Instance = controller;
+    controller._p5 = sketch;
+    sketch._nanoKontrol2Instance = controller;
     return controller;
   };
 
   // Advance smoothing once per frame, before the user's draw() runs.
   lifecycles.predraw = function () {
-    if (this._nanoKontrol2Instance) this._nanoKontrol2Instance._interpolate();
+    const instance = this._nanoKontrol2Instance;
+    if (!instance) return;
+    if (instance._debugLogs && !instance._predrawLogged) {
+      instance._predrawLogged = true;
+      console.log('[nanokontrol2] predraw hook is running — smoothing active');
+    }
+    instance._interpolate();
   };
 }
 
