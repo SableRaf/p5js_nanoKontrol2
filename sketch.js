@@ -1,5 +1,9 @@
-// nanoKONTROL2 → sketch parameters using WebMidi.js v3
+// nanoKONTROL2 → sketch parameters using the p5.nanokontrol2 addon.
 
+let midi;
+let hue = 0;
+let saturation = 100;
+let brightness = 100;
 let playing = false;
 
 function setup() {
@@ -7,39 +11,40 @@ function setup() {
   noStroke();
   colorMode(HSB, 360, 100, 100);
 
-  nano.setSmooth({ enabled: true, easingType: 'easeOut', duration: 500 });
+  midi = new NanoKontrol2();
+  midi.setSmooth({ enabled: true, easingType: 'easeOut', duration: 500 });
 }
 
 function draw() {
-  nano.interpolate();
+  // No midi.interpolate() needed — handled by the predraw lifecycle hook.
+  background(hue, saturation, playing ? brightness : brightness * 0.4);
 
-  if(nano.isPressed('play')) {
-    playing = true;
-    setLed('play', true);
-    setLed('stop', false);
-  }
-  if(nano.isPressed('stop')) {
-    playing = false;
-    setLed('play', false);
-    setLed('stop', true);
-  }
-
-  const h = map(nano.getValue('knob1'), 0, 1, 100, 360);
-  const s = map(nano.getValue('knob2'), 0, 1, 30, 100);
-  const b = map(nano.getValue('knob3'), 0, 1, 20, 100);
-  background(h, s, playing ? b : b * 0.4);
-
-  if(nano.isPressed('solo1')) {
-    // Do something on the frame solo1 is pressed (not held).
-  }
-
-  // Eight faders as a simple bar field — purely to confirm input works.
+  // Eight sliders as a simple bar field — purely to confirm input works.
   fill(0, 0, 100);
   const w = width / 8;
   for (let i = 0; i < 8; i++) {
-    const v = nano.getValue(`fader${i + 1}`);
+    const v = midi.getValue(`SLIDER_${i + 1}`);
     const h = v * height;
     rect(i * w, height - h, w - 4, h);
+  }
+}
+
+function inputChanged() {
+  if (midi.input === KNOB_1) hue = midi.value * 360;
+  if (midi.input === KNOB_2) saturation = 30 + midi.value * 70;
+  if (midi.input === KNOB_3) brightness = 20 + midi.value * 80;
+}
+
+function buttonPressed() {
+  if (midi.input === PLAY) {
+    playing = true;
+    midi.setLed(PLAY, true);
+    midi.setLed(STOP, false);
+  }
+  if (midi.input === STOP) {
+    playing = false;
+    midi.setLed(PLAY, false);
+    midi.setLed(STOP, true);
   }
 }
 
