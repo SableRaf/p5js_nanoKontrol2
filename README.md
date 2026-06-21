@@ -133,6 +133,28 @@ function draw() {
 
 ---
 
+### Controlling LEDs
+
+The nanoKONTROL2 can drive its button LEDs from the host when set to **External LED Control** mode.
+
+**Enable External LED Control mode:** hold the **CYCLE** button while plugging in the USB cable. Alternatively, use the [KORG KONTROL Editor](https://www.korg.com/us/support/download/software/1/133/1355/) and set LED Mode to "External".
+
+Once enabled, use `setLed()` to turn any button LED on or off by name:
+
+#### `setLed(name, on)`
+
+```js
+setLed('play', true);   // turn play LED on
+setLed('stop', false);  // turn stop LED off
+setLed('solo1', true);  // works for any named button
+```
+
+`name` must be one of the button names listed under [Control names](#control-names). Faders and knobs have no LEDs and are silently ignored.
+
+LEDs mirror the same CC numbers as their input buttons — `setLed` looks up the mapping automatically via `nano.nameToCC`, so no manual CC numbers are needed.
+
+---
+
 ### Utilities
 
 #### `has(name)`

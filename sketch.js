@@ -13,8 +13,16 @@ function setup() {
 function draw() {
   nano.interpolate();
 
-  if(nano.getButtonPressed('play')) playing = true;
-  if(nano.getButtonPressed('stop')) playing = false;
+  if(nano.isPressed('play')) {
+    playing = true;
+    setLed('play', true);
+    setLed('stop', false);
+  }
+  if(nano.isPressed('stop')) {
+    playing = false;
+    setLed('play', false);
+    setLed('stop', true);
+  }
 
   const h = map(nano.getValue('knob1'), 0, 1, 100, 360);
   const s = map(nano.getValue('knob2'), 0, 1, 30, 100);
