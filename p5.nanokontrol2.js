@@ -161,9 +161,12 @@ function durationToSpeed(ms) {
 
 class MidiController {
   // definition — a controller definition object: { name, controls: [...] }
-  // options    — { defaultValue } normalized 0..1 fallback before any input
-  constructor(definition, { defaultValue = 0 } = {}) {
+  // options    — { defaultValue, debugLogs }
+  //   defaultValue — normalized 0..1 fallback before any input
+  //   debugLogs    — when true, log raw MIDI events to the console
+  constructor(definition, { defaultValue = 0, debugLogs = false } = {}) {
     this._def = definition;
+    this._debugLogs = debugLogs;
 
     // Build CC ↔ name maps from the definition.
     this._ccMap = {};     // cc → { name, type }
@@ -325,6 +328,9 @@ class MidiController {
         this._output = e.port;
       }
     });
+    WebMidi.addListener('disconnected', e => {
+      if (this._debugLogs) console.log(`[nanokontrol2] disconnected: ${e.port.name}`);
+    });
 
     this._output = WebMidi.outputs.find(o => o.name.includes(this._def.name)) ?? null;
 
@@ -333,11 +339,27 @@ class MidiController {
 
   _listenTo(input) {
     input.removeListener();                    // guard against double-binding
+    if (this._debugLogs) console.log(`[nanokontrol2] listening: ${input.name}`);
     input.addListener('controlchange', e => this._onControlChange(e));
+    input.addListener('midimessage', e => this._onOtherMessage(e));
   }
 
   _onControlChange(e) {
+    if (this._debugLogs) {
+      console.log(
+        `[nanokontrol2] CC  ch${e.message.channel}  cc${e.controller.number}  val=${e.rawValue}`
+      );
+    }
     this._update(e.controller.number, e.rawValue); // 0..127
+  }
+
+  // Catch-all for notes, sysex, clock, etc. — CCs are handled above.
+  _onOtherMessage(e) {
+    if (!this._debugLogs || e.message.type === 'controlchange') return;
+    const hex = Array.from(e.message.data)
+      .map(b => b.toString(16).padStart(2, '0'))
+      .join(' ');
+    console.log(`[nanokontrol2] RAW  ${hex}`);
   }
 
   // Cycle every button LED on then off, then flash twice — a connect animation.
@@ -381,8 +403,9 @@ function nanoKontrol2Addon(p5, fn, lifecycles) {
 
   // Device-specific class. `this` inside is the p5 sketch instance; capture it
   // so the controller can reach `_customActions` and so `predraw` can find it.
-  fn.NanoKontrol2 = function () {
-    const controller = new MidiController(NANOKONTROL2_DEF);
+  // options — { debugLogs } to log raw MIDI events to the console.
+  fn.NanoKontrol2 = function (options = {}) {
+    const controller = new MidiController(NANOKONTROL2_DEF, options);
     controller._p5 = this;
     this._nanoKontrol2Instance = controller;
     return controller;

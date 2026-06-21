@@ -11,7 +11,7 @@ function setup() {
   noStroke();
   colorMode(HSB, 360, 100, 100);
 
-  midi = new NanoKontrol2();
+  midi = new NanoKontrol2({ debugLogs: true });
   midi.setSmooth({ enabled: true, easingType: 'easeOut', duration: 500 });
 }
 
