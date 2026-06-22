@@ -167,7 +167,7 @@ Per-input settings take precedence over the global setting.
 The nanoKONTROL2 can drive its button LEDs from the host when set to **External LED Control** mode.
 
 > [!IMPORTANT]
->  **Enable External LED Control mode:** hold the **CYCLE** button while plugging in the USB cable. Alternatively, use the [KORG KONTROL Editor](https://www.korg.com/us/support/download/software/1/133/1355/) and set LED Mode to "External". In the default "Internal" mode the unit drives its own LEDs and ignores `setLed()`.
+>  To allow external control of the LEDs, **Enable External LED Control mode:** download, install, and open the [KORG KONTROL Editor](https://www.korg.com/us/support/download/software/1/133/1355/). Go to the Control tab, select "Common" and set LED Mode to "External".
 
 #### `setLed(name, on)`
 
