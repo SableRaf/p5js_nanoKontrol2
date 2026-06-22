@@ -177,7 +177,9 @@ midi.setLed(STOP, false);  // turn STOP LED off
 midi.setLed(SOLO_1, true); // works for any named button
 ```
 
-`name` must be one of the button constants. Sliders and knobs have no LEDs and are silently ignored.
+`name` must be one of the button constants. 
+
+Note: Function buttons (PREV_TRACK, NEXT_TRACK, etc.) do not have LEDs and are ignored when passed to `setLed()`.
 
 ---
 
