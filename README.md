@@ -2,6 +2,11 @@
 
 A [p5.js](https://p5js.org/) addon library for the Korg nanoKONTROL2, built on [WebMidi.js v3](https://webmidijs.org/). Knob and slider moves arrive through an `inputChanged()` callback, button presses through `buttonPressed()` / `buttonReleased()`, and the most recent input is exposed on a `midi` object as `midi.input` and `midi.value`.
 
+## Why this library?
+The Korg nanoKONTROL2 is a popular, affordable MIDI controller. 
+
+This library makes it easy to connect it to a p5 sketch. I tried to design a simple API that feels at home in p5 with methods like `buttonPressed()` and `inputChanged()`, modeled after p5's own event functions like `mousePressed()`. 
+
 ## Setup
 
 Include the library after p5.js, then create a `NanoKontrol2` in `setup()`:
@@ -225,3 +230,6 @@ function buttonPressed() {
   if (midi.input === STOP) { playing = false; midi.setLed(PLAY, false); }
 }
 ```
+
+## AI Disclosure 
+Large parts of this project's code and documentation were written or edited with the help of LLM-based tools including Claude Code and GitHub Copilot. A realhuman (me, @SableRaf) has tested the code and verified that everything works as described, but please let me know if you find any bugs, by filing an issue.
