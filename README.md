@@ -1,15 +1,15 @@
 # p5.nanokontrol2
 
-A [p5.js](https://p5js.org/) addon library for the Korg nanoKONTROL2, built on [WebMidi.js v3](https://webmidijs.org/). Knob and slider moves arrive through an `inputChanged()` callback, button presses through `buttonPressed()` / `buttonReleased()`, and the most recent input is exposed on a `midi` object as `midi.input` and `midi.value`.
+This is a [p5.js](https://p5js.org/) addon library for the Korg nanoKONTROL2, built on [WebMidi.js v3](https://webmidijs.org/).
 
 ## Why this library?
-The Korg nanoKONTROL2 is a popular, affordable MIDI controller. 
+The Korg nanoKONTROL2 is a popular, affordable MIDI controller. It makes it a good fit for p5 users who want to add physical controls to their sketches. Web MIDI is a powerful API, but it can be a bit low-level and complicated for beginners.
 
-This library makes it easy to connect it to a p5 sketch. I tried to design a simple API that feels at home in p5 with methods like `buttonPressed()` and `inputChanged()`, modeled after p5's own event functions like `mousePressed()`. 
+I tried to design a simple API that feels at home in p5 with methods like `buttonPressed()` and `inputChanged()`, modeled after p5's own event functions like `mousePressed()`. 
 
 ## Setup
 
-Include the library after p5.js, then create a `NanoKontrol2` in `setup()`:
+Include the library after p5.js.
 
 ```html
 <script src="https://cdn.jsdelivr.net/npm/webmidi@3/dist/iife/webmidi.iife.js"></script>
@@ -17,6 +17,8 @@ Include the library after p5.js, then create a `NanoKontrol2` in `setup()`:
 <script src="p5.nanokontrol2.js"></script>
 <script src="sketch.js"></script>
 ```
+
+Create a `NanoKontrol2` in `setup()`:
 
 ```js
 let midi;
