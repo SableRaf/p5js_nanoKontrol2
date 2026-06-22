@@ -1,12 +1,20 @@
 # p5.nanokontrol2
 
-This is a [p5.js](https://p5js.org/) addon library for the Korg nanoKONTROL2, built on [WebMidi.js v3](https://webmidijs.org/).
+This is a [p5.js](https://p5js.org/) addon library for the [Korg nanoKONTROL2](https://www.korg.com/us/products/computergear/nanokontrol2/) MIDI controller, built on [WebMidi.js v3](https://webmidijs.org/).
 
-The [Korg nanoKONTROL2](https://www.korg.com/us/products/computergear/nanokontrol2/) is a popular, compact, and relatively affordable MIDI controller. That makes it a good fit for p5 users who want to add physical controls to their sketches. 
-
+## Why this library?
 Web MIDI is a powerful API, but it can be a bit low-level and complicated for beginners, so I tried to design a simple API that feels at home in p5 with methods modeled after p5's event functions like `mousePressed()` or `keyPressed()`. 
 
 This library adds a `NanoKontrol2` class to manage MIDI input from the device. It add the `inputChanged()`, `buttonPressed()`, and `buttonReleased()` event functions for responding to control changes.
+
+## Why nanoKONTROL2?
+The [Korg nanoKONTROL2](https://www.korg.com/us/products/computergear/nanokontrol2/) is a popular, compact, and relatively affordable MIDI controller. That makes it a good fit for p5.js users who want to add physical controls to their sketches. 
+
+The library is designed specifically for the nanoKONTROL2's controls and MIDI messages, so it won't work with other devices out of the box. This is a choice to keep the API simple and focused, and because this is the only MIDI controller I own. 
+
+If there's interest in supporting more devices in the future, I could consider making a more generic version of the library or adding support for specific additional controllers.
+
+If you want to use a different MIDI controller with p5.js, you can use WebMidi.js directly.
 
 ## Getting started
 
