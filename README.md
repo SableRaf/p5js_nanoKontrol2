@@ -2,12 +2,13 @@
 
 This is a [p5.js](https://p5js.org/) addon library for the Korg nanoKONTROL2, built on [WebMidi.js v3](https://webmidijs.org/).
 
-## Why this library?
-The Korg nanoKONTROL2 is a popular, affordable MIDI controller. It makes it a good fit for p5 users who want to add physical controls to their sketches. Web MIDI is a powerful API, but it can be a bit low-level and complicated for beginners.
+The Korg nanoKONTROL2 is a popular, affordable MIDI controller. That makes it a good fit for p5 users who want to add physical controls to their sketches. 
 
-I tried to design a simple API that feels at home in p5 with methods like `buttonPressed()` and `inputChanged()`, modeled after p5's own event functions like `mousePressed()`. 
+Web MIDI is a powerful API, but it can be a bit low-level and complicated for beginners, so I tried to design a simple API that feels at home in p5 with methods modeled after p5's event functions like `mousePressed()` or `keyPressed()`. 
 
-## Setup
+This library adds a `NanoKontrol2` class to manage MIDI input from the device. It add the `inputChanged()`, `buttonPressed()`, and `buttonReleased()` event functions for responding to control changes.
+
+## Getting started
 
 Include the library after p5.js.
 
@@ -57,23 +58,10 @@ Controls are referenced by ALL_CAPS constants, exposed as p5 globals.
 new NanoKontrol2({ debugLogs })
 ```
 
-| Option | Type | Default | Description |
-|---|---|---|---|
-| `debugLogs` | `boolean` | `false` | Log raw MIDI events, port connect/disconnect, and a predraw heartbeat to the console. |
+To get detailed MIDI message logs in the console, pass `debugLogs: true` when creating the instance:
 
 ```js
 midi = new NanoKontrol2({ debugLogs: true });
-```
-
----
-
-### State
-
-The most recently triggered control is exposed on the instance:
-
-```js
-midi.input  // the constant of the last control touched, e.g. KNOB_1, PLAY
-midi.value  // 0..1 for knobs/sliders; 1 (pressed) / 0 (released) for buttons
 ```
 
 ---
@@ -132,8 +120,6 @@ midi.getValue(SLIDER_1, { defaultValue: 0.5 }); // 0.5 before first touch
 - `defaultValue` (0–1) is returned for a control that has not yet received a message — useful to avoid a snap from zero on first touch.
 - `smoothed` — `true` (default) returns the smoothed value when smoothing is enabled; `false` returns the immediate target.
 
----
-
 ### Input mode
 
 Values are normalized to `0..1` by default. Switch to raw `0..127` MIDI values globally or per control:
@@ -174,22 +160,13 @@ midi.setSmooth({ inputName: KNOB_1, enabled: false });
 
 Per-input settings take precedence over the global setting.
 
-**Easing types**
-
-| Name | Shape |
-|---|---|
-| `lerp` | Constant speed (linear interpolation) |
-| `easeIn` | Starts slow, ends fast |
-| `easeOut` | Starts fast, ends slow |
-| `easeInOut` | Slow at both ends |
-
 ---
 
 ### Controlling LEDs
 
 The nanoKONTROL2 can drive its button LEDs from the host when set to **External LED Control** mode.
 
-**Enable External LED Control mode:** hold the **CYCLE** button while plugging in the USB cable. Alternatively, use the [KORG KONTROL Editor](https://www.korg.com/us/support/download/software/1/133/1355/) and set LED Mode to "External". In the default "Internal" mode the unit drives its own LEDs and ignores `setLed()`.
+🚦 **Enable External LED Control mode:** hold the **CYCLE** button while plugging in the USB cable. Alternatively, use the [KORG KONTROL Editor](https://www.korg.com/us/support/download/software/1/133/1355/) and set LED Mode to "External". In the default "Internal" mode the unit drives its own LEDs and ignores `setLed()`.
 
 #### `setLed(name, on)`
 
