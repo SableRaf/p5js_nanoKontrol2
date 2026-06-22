@@ -2,7 +2,7 @@
 
 This is a [p5.js](https://p5js.org/) addon library for the Korg nanoKONTROL2, built on [WebMidi.js v3](https://webmidijs.org/).
 
-The Korg nanoKONTROL2 is a popular, affordable MIDI controller. That makes it a good fit for p5 users who want to add physical controls to their sketches. 
+The Korg nanoKONTROL2 is a popular, compact, and relatively affordable MIDI controller. That makes it a good fit for p5 users who want to add physical controls to their sketches. 
 
 Web MIDI is a powerful API, but it can be a bit low-level and complicated for beginners, so I tried to design a simple API that feels at home in p5 with methods modeled after p5's event functions like `mousePressed()` or `keyPressed()`. 
 
