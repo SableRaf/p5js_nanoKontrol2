@@ -232,4 +232,4 @@ function buttonPressed() {
 ```
 
 ## AI Disclosure 
-Large parts of this project's code and documentation were written or edited with the help of LLM-based tools including Claude Code and GitHub Copilot. A realhuman (me, @SableRaf) has tested the code and verified that everything works as described, but please let me know if you find any bugs, by filing an issue.
+Large parts of this project's code and documentation were written or edited with the help of LLM-based tools including Claude Code and GitHub Copilot. A real human (me, @SableRaf) has tested the code and verified that everything works as described, but please let me know if you find any bugs, by filing an issue.
