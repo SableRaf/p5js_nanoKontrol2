@@ -18,14 +18,16 @@ If you want to use a different MIDI controller with p5.js, you can use WebMidi.j
 
 ## Getting started
 
-Include the library after p5.js.
+Include the library after p5.js. The built file lives in `dist/`.
 
 ```html
 <script src="https://cdn.jsdelivr.net/npm/webmidi@3/dist/iife/webmidi.iife.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/p5@2.3.0/lib/p5.min.js"></script>
-<script src="p5.nanokontrol2.js"></script>
+<script src="dist/p5.nanokontrol2.js"></script>
 <script src="sketch.js"></script>
 ```
+
+Use `dist/p5.nanokontrol2.min.js` for the minified build.
 
 Create a `NanoKontrol2` in `setup()`:
 
@@ -219,6 +221,35 @@ function buttonPressed() {
   if (midi.input === PLAY) { playing = true; midi.setLed(PLAY, true); }
   if (midi.input === STOP) { playing = false; midi.setLed(PLAY, false); }
 }
+```
+
+## Project layout
+
+- `src/` — the library source, written in TypeScript and split into modules
+  (constants, controller definition, smoothing, the `MidiController` engine, and
+  the p5 addon registration).
+- `dist/` — the webpack build output: `p5.nanokontrol2.js`,
+  `p5.nanokontrol2.min.js`, and TypeScript declarations under `dist/types/`.
+- `examples/` — a runnable sketch (`index.html`, `sketch.js`, `style.css`).
+  Build first, then open `examples/index.html` in a Web MIDI-capable browser.
+
+## TypeScript
+
+The library is written in TypeScript and ships declarations in `dist/types/`.
+Sketch authors writing TypeScript in p5 global mode can pull in ambient types for
+the `NanoKontrol2` class and the input constants (`KNOB_1`, `PLAY`, …) with:
+
+```ts
+/// <reference path="./dist/types/p5.nanokontrol2.d.ts" />
+```
+
+## Building from source
+
+```bash
+npm install
+npm run build       # production + development bundles + type declarations
+npm run build:dev   # unminified bundle only
+npm run watch       # rebuild on change
 ```
 
 ## AI Disclosure 
