@@ -232,8 +232,8 @@ function buttonPressed() {
     midi.setLed(STOP, true);
   }
 
-  if (midi.input === PREV_MARKER) paletteOffset = ((paletteOffset - 1) % palettes[paletteIndex].length + palettes[paletteIndex].length) % palettes[paletteIndex].length;
-  if (midi.input === NEXT_MARKER) paletteOffset = (paletteOffset + 1) % palettes[paletteIndex].length;
+  if (midi.input === NEXT_MARKER) paletteOffset = ((paletteOffset - 1) % palettes[paletteIndex].length + palettes[paletteIndex].length) % palettes[paletteIndex].length;
+  if (midi.input === PREV_MARKER) paletteOffset = (paletteOffset + 1) % palettes[paletteIndex].length;
   if (midi.input === PREV_TRACK) {
     paletteIndex = ((paletteIndex - 1) % palettes.length + palettes.length) % palettes.length;
     paletteOffset = 0;
