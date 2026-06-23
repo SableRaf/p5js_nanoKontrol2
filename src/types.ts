@@ -24,6 +24,8 @@ export interface MidiControllerOptions {
   defaultValue?: number;
   /** When true, log raw MIDI events to the console. */
   debugLogs?: boolean;
+  /** Called once the MIDI port is connected and the startup LED sequence has finished. */
+  onReady?: () => void;
 }
 
 export interface SmoothConfig {

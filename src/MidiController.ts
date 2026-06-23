@@ -36,6 +36,8 @@ export class MidiController {
   /** WebMidi output port for LED control. */
   private _output: any = null;
 
+  private _onReady: (() => void) | undefined;
+
   /** Reference to the owning p5 instance (set by the addon factory). */
   _p5: any = null;
   _predrawLogged = false;
@@ -44,9 +46,10 @@ export class MidiController {
   // options    — { defaultValue, debugLogs }
   //   defaultValue — normalized 0..1 fallback before any input
   //   debugLogs    — when true, log raw MIDI events to the console
-  constructor(definition: ControllerDefinition, { defaultValue = 0, debugLogs = false }: MidiControllerOptions = {}) {
+  constructor(definition: ControllerDefinition, { defaultValue = 0, debugLogs = false, onReady }: MidiControllerOptions = {}) {
     this._def = definition;
     this._debugLogs = debugLogs;
+    this._onReady = onReady;
 
     // Build CC ↔ name maps from the definition.
     for (const ctrl of definition.controls) {
@@ -228,7 +231,11 @@ export class MidiController {
 
     this._output = WebMidi.outputs.find((o: any) => o.name.includes(this._def.name)) ?? null;
 
-    if (this._output) this._ledStartupSequence();
+    if (this._output) {
+      this._ledStartupSequence().then(() => this._onReady?.());
+    } else {
+      this._onReady?.();
+    }
   }
 
   private _listenTo(input: any): void {
