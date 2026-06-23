@@ -2,18 +2,33 @@
 // Each character is the exact character from the original sketch — only its
 // hue changes per channel.
 //
-//   SLIDER_n  -> how high the character floats (0 = low, 1 = high)
-//   KNOB_n    -> the character's hue
-//   SOLO_n    -> blink (eyes shut while held)
-//   MUTE_n    -> open mouth (while held)
-//   REC_n     -> toggle this character's sleep state (press to flip)
-//   PLAY      -> everyone wakes up and bounces (default)
-//   STOP      -> everyone eases down to a low rest position and falls asleep
+//   SLIDER_n    -> how high the character floats (0 = low, 1 = high)
+//   KNOB_n      -> the character's hue shift (on top of palette color)
+//   SOLO_n      -> blink (eyes shut while held)
+//   MUTE_n      -> open mouth (while held)
+//   REC_n       -> toggle this character's sleep state (press to flip)
+//   PLAY        -> everyone wakes up and bounces (default)
+//   STOP        -> everyone eases down to a low rest position and falls asleep
+//   PREV/NEXT_MARKER -> cycle palette color offset (shift which color each character gets)
+//   PREV/NEXT_TRACK  -> cycle which palette is active
 
 const CHANNELS = 8;
 
 let midi;
 let playing = true;
+
+// Adapted from https://ronikaufman.github.io/color_pals/
+const palettes = [
+  ["#f398c3", "#f44e24", "#f4d730", "#23b247", "#2a76d3"],
+  ["#fef9c6", "#ffcc4d", "#f5b800", "#56a1c4", "#4464a1", "#ee726b", "#df5f50", "#5a3034"],
+  ["#4464a1", "#62b6de", "#b3dce0", "#ffc5c7", "#ee726b", "#cd1440"],
+  ["#f2eb8a", "#fed000", "#fc8405", "#ed361a", "#4464a1", "#f398c3", "#cf3895", "#6d358a", "#06b4b0", "#4b8a5f"],
+  ["#abcd5e", "#29ac9f", "#14976b", "#b3dce0", "#62b6de", "#2b67af", "#f589a3", "#ef562f", "#fc8405", "#f9d531"],
+  ["#584594", "#e488b7", "#d74c41", "#f0d235", "#36ad63", "#69bcea"]
+]
+
+let paletteIndex = 0;  // which palette is active
+let paletteOffset = 0; // shifts which color each character gets
 
 // Per-channel held-button state, tracked from buttonPressed/buttonReleased.
 const solo = new Array(CHANNELS).fill(false);
@@ -99,7 +114,7 @@ function drawCharacter(i, slotWidth) {
   const toothRounding = 50;
 
   // body
-  fillShifted(i, 0, 135, 200);
+  fillFromPalette(i);
   rect(-bodyWidth / 2, bodyVerticalOffset, bodyWidth, bodyHeight, bodyWidth / 2, bodyWidth / 2);
 
   // eyes
@@ -145,8 +160,13 @@ function drawCharacter(i, slotWidth) {
   pop();
 }
 
-// Set the fill to an RGB color rotated by this channel's hue shift.
-function fillShifted(i, r, g, b) {
+// Set the fill to the character's palette color, shifted by its knob hue.
+function fillFromPalette(i) {
+  const palette = palettes[paletteIndex];
+  const hex = palette[(i + paletteOffset) % palette.length];
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
   const [rr, gg, bb] = rotateHue(r, g, b, hueShift[i]);
   fill(rr, gg, bb);
 }
@@ -210,6 +230,17 @@ function buttonPressed() {
     playing = false;
     midi.setLed(PLAY, false);
     midi.setLed(STOP, true);
+  }
+
+  if (midi.input === PREV_MARKER) paletteOffset = ((paletteOffset - 1) % palettes[paletteIndex].length + palettes[paletteIndex].length) % palettes[paletteIndex].length;
+  if (midi.input === NEXT_MARKER) paletteOffset = (paletteOffset + 1) % palettes[paletteIndex].length;
+  if (midi.input === PREV_TRACK) {
+    paletteIndex = ((paletteIndex - 1) % palettes.length + palettes.length) % palettes.length;
+    paletteOffset = 0;
+  }
+  if (midi.input === NEXT_TRACK) {
+    paletteIndex = (paletteIndex + 1) % palettes.length;
+    paletteOffset = 0;
   }
 }
 
