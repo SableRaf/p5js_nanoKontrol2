@@ -7,13 +7,14 @@
   "files": [
     "dist",
     "src",
+    "scripts",
     "README.md"
   ],
   "scripts": {
     "build": "npm run build:prod && npm run build:dev && npm run build:types",
     "build:dev": "webpack --mode development",
     "build:prod": "webpack --mode production",
-    "build:types": "tsc --declaration --emitDeclarationOnly --outDir dist/types && cp src/p5.nanokontrol2.d.ts dist/types/p5.nanokontrol2.d.ts",
+    "build:types": "tsc --declaration --emitDeclarationOnly --outDir dist/types && node scripts/gen-types.js",
     "watch": "webpack --mode development --watch",
     "typecheck": "tsc --noEmit"
   },

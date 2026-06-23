@@ -14,8 +14,6 @@
 //
 // See README.md for the full public API.
 
-/// <reference path="./p5.nanokontrol2.d.ts" />
-
 import { nanoKontrol2Addon } from './addon';
 
 export { MidiController } from './MidiController';
