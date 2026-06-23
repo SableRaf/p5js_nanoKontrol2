@@ -1,12 +1,12 @@
-// A row of eight creatures, one per nanoKONTROL2 channel.
-// Each creature is the exact character from the original sketch — only its
+// A row of eight characters, one per nanoKONTROL2 channel.
+// Each character is the exact character from the original sketch — only its
 // hue changes per channel.
 //
-//   SLIDER_n  -> how high the creature floats (0 = low, 1 = high)
-//   KNOB_n    -> the creature's hue
+//   SLIDER_n  -> how high the character floats (0 = low, 1 = high)
+//   KNOB_n    -> the character's hue
 //   SOLO_n    -> blink (eyes shut while held)
 //   MUTE_n    -> open mouth (while held)
-//   REC_n     -> toggle this creature's sleep state (press to flip)
+//   REC_n     -> toggle this character's sleep state (press to flip)
 //   PLAY      -> everyone wakes up and bounces (default)
 //   STOP      -> everyone eases down to a low rest position and falls asleep
 
@@ -28,12 +28,9 @@ const charY = new Array(CHANNELS).fill(null); // current eased vertical position
 function setup() {
   createCanvas(windowWidth, windowHeight);
 
-  midi = new NanoKontrol2({ debugLogs: true });
-  midi.setSmooth({ enabled: true, easingType: 'easeOut', duration: 400 });
+  midi = new NanoKontrol2({ onReady() { midi.setLed(PLAY, true); }});
 
-  // PLAY is the default mode.
-  midi.setLed(PLAY, true);
-  midi.setLed(STOP, false);
+  // midi.setSmooth({ enabled: true, easingType: 'easeOut', duration: 400 });
 }
 
 function draw() {
@@ -41,11 +38,11 @@ function draw() {
 
   const slotWidth = width / CHANNELS;
   for (let i = 0; i < CHANNELS; i++) {
-    drawCreature(i, slotWidth);
+    drawCharacter(i, slotWidth);
   }
 }
 
-function drawCreature(i, slotWidth) {
+function drawCharacter(i, slotWidth) {
   const cx = slotWidth * (i + 0.5);
 
   // Slider sets the resting height: 1 -> high, 0 -> low.
@@ -72,7 +69,7 @@ function drawCreature(i, slotWidth) {
 
   // Eyes shut when soloing or while falling asleep.
   const eyesShut = solo[i] || e < 0.5;
-  const mouthExtra = mute[i] ? 220 : 0;
+  const mouthExtra = mute[i] ? 100 : 0;
 
   push();
   translate(cx, charY[i]);
@@ -124,14 +121,15 @@ function drawCreature(i, slotWidth) {
     ellipse(+150, eyesVerticalOffset, 100);
   }
 
-  if (e < 0.5) {
+  // mouth
+  if (sleeping) {
     // asleep: a single smiley line instead of the toothy mouth
     noFill();
     stroke(0);
     const mouthCenterX = mouthHorizontalOffset + mouthWidth / 2;
     arc(mouthCenterX, mouthVerticalOffset, mouthWidth*0.5, mouthWidth*0.5, 0, PI);
   } else {
-    // mouth (opens on MUTE instead of reacting to a microphone)
+    // mouth (opens on MUTE button pressed)
     fill(240, 150, 150);
     rect(mouthHorizontalOffset, mouthVerticalOffset, mouthWidth, 80 + mouthExtra, 5, 5, 100, 100);
 
