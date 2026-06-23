@@ -292,7 +292,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./constants */ "./src/constants.ts");
 /* harmony import */ var _MidiController__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./MidiController */ "./src/MidiController.ts");
-/* harmony import */ var _definitions_nanokontrol2__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./definitions/nanokontrol2 */ "./src/definitions/nanokontrol2.ts");
+/* harmony import */ var _devices_nanokontrol2__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./devices/nanokontrol2 */ "./src/devices/nanokontrol2.ts");
 // p5 addon registration.
 
 
@@ -311,7 +311,7 @@ function nanoKontrol2Addon(p5, fn, lifecycles) {
     // options — { debugLogs } to log raw MIDI events to the console.
     fn.NanoKontrol2 = function (options = {}) {
         const sketch = (this instanceof p5) ? this : p5.instance;
-        const controller = new _MidiController__WEBPACK_IMPORTED_MODULE_1__.MidiController(_definitions_nanokontrol2__WEBPACK_IMPORTED_MODULE_2__.NANOKONTROL2_DEF, options);
+        const controller = new _MidiController__WEBPACK_IMPORTED_MODULE_1__.MidiController(_devices_nanokontrol2__WEBPACK_IMPORTED_MODULE_2__.NANOKONTROL2_DEF, options);
         controller._p5 = sketch;
         sketch._nanoKontrol2Instance = controller;
         return controller;
@@ -438,10 +438,10 @@ const CONSTANTS = {
 
 /***/ },
 
-/***/ "./src/definitions/nanokontrol2.ts"
-/*!*****************************************!*\
-  !*** ./src/definitions/nanokontrol2.ts ***!
-  \*****************************************/
+/***/ "./src/devices/nanokontrol2.ts"
+/*!*************************************!*\
+  !*** ./src/devices/nanokontrol2.ts ***!
+  \*************************************/
 (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 __webpack_require__.r(__webpack_exports__);
@@ -653,7 +653,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   MUTE_7: () => (/* reexport safe */ _constants__WEBPACK_IMPORTED_MODULE_3__.MUTE_7),
 /* harmony export */   MUTE_8: () => (/* reexport safe */ _constants__WEBPACK_IMPORTED_MODULE_3__.MUTE_8),
 /* harmony export */   MidiController: () => (/* reexport safe */ _MidiController__WEBPACK_IMPORTED_MODULE_1__.MidiController),
-/* harmony export */   NANOKONTROL2_DEF: () => (/* reexport safe */ _definitions_nanokontrol2__WEBPACK_IMPORTED_MODULE_2__.NANOKONTROL2_DEF),
+/* harmony export */   NANOKONTROL2_DEF: () => (/* reexport safe */ _devices_nanokontrol2__WEBPACK_IMPORTED_MODULE_2__.NANOKONTROL2_DEF),
 /* harmony export */   NEXT_MARKER: () => (/* reexport safe */ _constants__WEBPACK_IMPORTED_MODULE_3__.NEXT_MARKER),
 /* harmony export */   NEXT_TRACK: () => (/* reexport safe */ _constants__WEBPACK_IMPORTED_MODULE_3__.NEXT_TRACK),
 /* harmony export */   PLAY: () => (/* reexport safe */ _constants__WEBPACK_IMPORTED_MODULE_3__.PLAY),
@@ -692,7 +692,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var _addon__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./addon */ "./src/addon.ts");
 /* harmony import */ var _MidiController__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./MidiController */ "./src/MidiController.ts");
-/* harmony import */ var _definitions_nanokontrol2__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./definitions/nanokontrol2 */ "./src/definitions/nanokontrol2.ts");
+/* harmony import */ var _devices_nanokontrol2__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./devices/nanokontrol2 */ "./src/devices/nanokontrol2.ts");
 /* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./constants */ "./src/constants.ts");
 /* harmony import */ var _types__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./types */ "./src/types.ts");
 // p5.nanokontrol2 — a p5.js addon library for the KORG nanoKONTROL2

@@ -226,8 +226,8 @@ function buttonPressed() {
 ## Project layout
 
 - `src/` — the library source, written in TypeScript and split into modules
-  (constants, controller definition, smoothing, the `MidiController` engine, and
-  the p5 addon registration).
+  (constants, device definitions under `src/devices/`, smoothing, the
+  `MidiController` engine, and the p5 addon registration).
 - `dist/` — the webpack build output: `p5.nanokontrol2.js`,
   `p5.nanokontrol2.min.js`, and TypeScript declarations under `dist/types/`.
 - `examples/` — a runnable sketch (`index.html`, `sketch.js`, `style.css`).
