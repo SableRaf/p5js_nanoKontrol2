@@ -1,8 +1,13 @@
-// nanoKONTROL2 controller definition — the single source of truth for this
-// device's control names, CC numbers, and types. The public input constants
-// (exposed as p5 globals) and the ambient TypeScript declarations are both
-// derived from this object. To support a different controller, define a new
-// object of the same shape and pass it to `new MidiController(def)`.
+// nanoKONTROL2 controller definition 
+// The single source of truth for this 
+// device's inputs, mapping, and layout. 
+
+// The public input constants (exposed as p5 globals) 
+// and the ambient TypeScript declarations are both 
+// derived from this object. 
+
+// To support a different controller, define a new object 
+// of the same shape and pass it to `new MidiController(def)`.
 
 import type { ControllerDefinition } from '../types';
 
