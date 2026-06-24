@@ -1,19 +1,30 @@
 // Shared types for the p5.nanokontrol2 library.
 
-export type ControlType = 'continuous' | 'button';
+export type ControlType = 'continuous' | 'momentary' | 'toggle';
+export type CtrlType = 'cc';
 
 export interface Control {
-  /** MIDI Control Change number. */
-  cc: number;
   /** Public constant name, e.g. 'SLIDER_1'. */
-  name: string;
+  constant: string;
+  /** Human-readable label, e.g. 'Fader 1'. */
+  title: string;
+  /** MIDI message type — 'cc' for Control Change. */
+  ctrlType: CtrlType;
+  /** One or more CC numbers this control listens on. */
+  ctrlIndex: number[];
+  /** MIDI channel (1-based). */
+  channel: number;
   /** Whether the control reports a continuous value or acts as a button. */
   type: ControlType;
+  /** Optional OSC-style parameter path, e.g. '/strip/1/fader'. */
+  paramPath?: string;
 }
 
 export interface ControllerDefinition {
+  manufacturer: string;
   /** Matched (substring) against WebMidi port names. */
-  name: string;
+  model: string;
+  version: string;
   controls: Control[];
 }
 

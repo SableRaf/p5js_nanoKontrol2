@@ -11,7 +11,7 @@ export function nanoKontrol2Addon(p5: any, fn: any, lifecycles: any): void {
   // generic constants are added alongside them.
   fn.RAW = RAW;
   for (const ctrl of NANOKONTROL2_DEF.controls) {
-    fn[ctrl.name] = ctrl.name;
+    fn[ctrl.constant] = ctrl.constant;
   }
 
   // Expose the generic engine for power users defining custom controllers.

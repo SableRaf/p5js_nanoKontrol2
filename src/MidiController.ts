@@ -15,7 +15,7 @@ export class MidiController {
   private _def: ControllerDefinition;
   private _debugLogs: boolean;
 
-  private _ccMap: Record<number, { name: string; type: ControlType }> = {};
+  private _ccMap: Record<number, { constant: string; type: ControlType }> = {};
   private _nameToCC: Record<string, number> = {};
 
   /** Constant of the last-triggered control. */
@@ -53,8 +53,10 @@ export class MidiController {
 
     // Build CC ↔ name maps from the definition.
     for (const ctrl of definition.controls) {
-      this._ccMap[ctrl.cc] = { name: ctrl.name, type: ctrl.type };
-      this._nameToCC[ctrl.name] = ctrl.cc;
+      for (const cc of ctrl.ctrlIndex) {
+        this._ccMap[cc] = { constant: ctrl.constant, type: ctrl.type };
+      }
+      this._nameToCC[ctrl.constant] = ctrl.ctrlIndex[0];
     }
 
     this._defaultValue = Math.min(Math.max(defaultValue, 0), 1) * MIDI_CC_MAX;
@@ -151,7 +153,7 @@ export class MidiController {
     this._prevValues[cc] = this._values[cc];
     this._values[cc] = rawValue;
 
-    this.input = ctrl.name;
+    this.input = ctrl.constant;
 
     const actions = this._p5 ? this._p5._customActions : null;
     if (!actions) return;
@@ -160,10 +162,10 @@ export class MidiController {
       // Report the immediate target value to the callback. When smoothing is
       // enabled, _interpolate() re-fires inputChanged each frame with the
       // smoothed value until the control settles.
-      this.value = this.getValue(ctrl.name, { smoothed: false });
+      this.value = this.getValue(ctrl.constant, { smoothed: false });
       if (typeof actions.inputChanged === 'function') actions.inputChanged.call(this._p5);
     } else {
-      this.value = this.getValue(ctrl.name, { smoothed: false });
+      this.value = this.getValue(ctrl.constant, { smoothed: false });
       const prev = this._prevValues[cc] ?? 0;
       if (rawValue > 0 && prev === 0) {
         if (typeof actions.buttonPressed === 'function') actions.buttonPressed.call(this._p5);
@@ -181,7 +183,7 @@ export class MidiController {
     const actions = this._p5 ? this._p5._customActions : null;
     for (const [ccKey, ctrl] of Object.entries(this._ccMap)) {
       const cc = Number(ccKey);
-      const smooth = this._smoothFor(ctrl.name);
+      const smooth = this._smoothFor(ctrl.constant);
       if (!smooth.enabled) continue;
 
       const target = this._values[cc] ?? this._defaultValue;
@@ -198,8 +200,8 @@ export class MidiController {
       // Re-dispatch inputChanged for continuous controls so callbacks that
       // read midi.value keep tracking the smoothed value.
       if (ctrl.type === 'continuous' && actions && typeof actions.inputChanged === 'function') {
-        this.input = ctrl.name;
-        this.value = this.getValue(ctrl.name);
+        this.input = ctrl.constant;
+        this.value = this.getValue(ctrl.constant);
         actions.inputChanged.call(this._p5);
       }
     }
@@ -221,7 +223,7 @@ export class MidiController {
     WebMidi.inputs.forEach((input: any) => this._listenTo(input)); // ports at startup
     WebMidi.addListener('connected', (e: any) => {                 // and hot-plugged
       if (e.port.type === 'input') this._listenTo(e.port);
-      if (e.port.type === 'output' && e.port.name.includes(this._def.name)) {
+      if (e.port.type === 'output' && e.port.name.includes(this._def.model)) {
         this._output = e.port;
       }
     });
@@ -229,7 +231,7 @@ export class MidiController {
       if (this._debugLogs) console.log(`[nanokontrol2] disconnected: ${e.port.name}`);
     });
 
-    this._output = WebMidi.outputs.find((o: any) => o.name.includes(this._def.name)) ?? null;
+    this._output = WebMidi.outputs.find((o: any) => o.name.includes(this._def.model)) ?? null;
 
     if (this._output) {
       this._ledStartupSequence().then(() => this._onReady?.());
@@ -266,8 +268,8 @@ export class MidiController {
   // Cycle every button LED on then off, then flash twice — a connect animation.
   private async _ledStartupSequence(): Promise<void> {
     const buttonNames = this._def.controls
-      .filter(c => c.type === 'button')
-      .map(c => c.name);
+      .filter(c => c.type === 'momentary' || c.type === 'toggle')
+      .map(c => c.constant);
     const delay = (ms: number) => new Promise(r => setTimeout(r, ms));
 
     for (const name of buttonNames) this.setLed(name, false); // start clean
