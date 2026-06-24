@@ -2,15 +2,13 @@
 // The single source of truth for this 
 // device's inputs, mapping, and layout. 
 
-// The public input constants (exposed as p5 globals) 
-// and the ambient TypeScript declarations are both 
-// derived from this object. 
-
 // To support a different controller, define a new object 
 // of the same shape and pass it to `new MidiController(def)`.
 
 import type { ControllerDefinition } from '../types';
 
+// The public input constants (exposed as p5 globals) and the 
+// TypeScript declarations are both derived from this object. 
 export const NANOKONTROL2_DEF: ControllerDefinition = {
   manufacturer: 'KORG',
   model: 'nanoKONTROL2', // matched against WebMidi port names
