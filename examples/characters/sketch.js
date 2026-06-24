@@ -24,7 +24,8 @@ const palettes = [
   ["#4464a1", "#62b6de", "#b3dce0", "#ffc5c7", "#ee726b", "#cd1440"],
   ["#f2eb8a", "#fed000", "#fc8405", "#ed361a", "#4464a1", "#f398c3", "#cf3895", "#6d358a", "#06b4b0", "#4b8a5f"],
   ["#abcd5e", "#29ac9f", "#14976b", "#b3dce0", "#62b6de", "#2b67af", "#f589a3", "#ef562f", "#fc8405", "#f9d531"],
-  ["#584594", "#e488b7", "#d74c41", "#f0d235", "#36ad63", "#69bcea"]
+  ["#584594", "#e488b7", "#d74c41", "#f0d235", "#36ad63", "#69bcea"],
+  ["#F59FAC", "#F2C800", "#72ADDC", "#BC71BA", "#62B100", "#F5B200", "#CC530A"] // Waxy Corn, Dark Orange
 ]
 
 let paletteIndex = 0;  // which palette is active
