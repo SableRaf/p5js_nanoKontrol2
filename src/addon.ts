@@ -2,7 +2,7 @@
 
 import { RAW } from './constants';
 import { MidiController } from './MidiController';
-import { NANOKONTROL2_DEF } from './devices/nanokontrol2';
+import { NANOKONTROL2_DEF } from './devices/nanokontrol2.device';
 import type { MidiControllerOptions } from './types';
 
 export function nanoKontrol2Addon(p5: any, fn: any, lifecycles: any): void {

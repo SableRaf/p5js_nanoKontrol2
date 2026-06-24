@@ -14,10 +14,14 @@ export interface Control {
   ctrlIndex: number[];
   /** MIDI channel (1-based). */
   channel: number;
-  /** Whether the control reports a continuous value or acts as a button. */
+  /** Whether the control reports a continuous value, momentary value, or toggle state. */
   type: ControlType;
   /** Optional OSC-style parameter path, e.g. '/strip/1/fader'. */
   paramPath?: string;
+  /** Minimum raw MIDI value (default 0). */
+  lower: number;
+  /** Maximum raw MIDI value (default 127). */
+  upper: number;
 }
 
 export interface ControllerDefinition {
