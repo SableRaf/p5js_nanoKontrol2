@@ -30,18 +30,20 @@ function draw() {
 }
 
 function inputChanged() {
-  if (midi.input === KNOB_1) hue = midi.value * 360;
-  if (midi.input === KNOB_2) saturation = 30 + midi.value * 70;
-  if (midi.input === KNOB_3) brightness = 20 + midi.value * 80;
+  const inputName = midi.input.name;
+  if (inputName === KNOB_1) hue = midi.value * 360;
+  if (inputName === KNOB_2) saturation = 30 + midi.value * 70;
+  if (inputName === KNOB_3) brightness = 20 + midi.value * 80;
 }
 
 function buttonPressed() {
-  if (midi.input === PLAY) {
+  const inputName = midi.input.name;
+  if (inputName === PLAY) {
     playing = true;
     midi.setLed(PLAY, true);
     midi.setLed(STOP, false);
   }
-  if (midi.input === STOP) {
+  if (inputName === STOP) {
     playing = false;
     midi.setLed(PLAY, false);
     midi.setLed(STOP, true);

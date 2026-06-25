@@ -34,6 +34,14 @@ export interface ControllerDefinition {
   controls: Control[];
 }
 
+/** The object set on midi.input when a control fires. */
+export interface InputControl {
+  /** The control's constant name, e.g. 'KNOB_1'. */
+  name: string;
+  type: ControlType;
+  hasLed: boolean;
+}
+
 export type EasingType = 'lerp' | 'easeIn' | 'easeOut' | 'easeInOut';
 
 export interface MidiControllerOptions {

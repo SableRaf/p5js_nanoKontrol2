@@ -4,8 +4,8 @@ import { MIDI_CC_MAX, RAW } from './constants';
 import { EASING, durationToSpeed } from './smoothing';
 import type {
   ControllerDefinition,
-  ControlType,
   GetValueOptions,
+  InputControl,
   MidiControllerOptions,
   SetSmoothOptions,
   SmoothConfig,
@@ -15,11 +15,11 @@ export class MidiController {
   private _def: ControllerDefinition;
   private _debugLogs: boolean;
 
-  private _ccMap: Record<number, { constant: string; type: ControlType; hasLed: boolean }> = {};
+  private _ccMap: Record<number, InputControl> = {};
   private _nameToCC: Record<string, number> = {};
 
-  /** Constant of the last-triggered control. */
-  input: string | null = null;
+  /** The last-triggered control, with its metadata. */
+  input: InputControl | null = null;
   /** Value of the last-triggered control. */
   value = 0;
 
@@ -57,9 +57,13 @@ export class MidiController {
 
     // Build CC ↔ name maps from the definition.
     for (const ctrl of definition.controls) {
-      const hasLed = ctrl.hasLed ?? (ctrl.type === 'momentary' || ctrl.type === 'toggle');
+      const entry: InputControl = {
+        name: ctrl.constant,
+        type: ctrl.type,
+        hasLed: ctrl.hasLed ?? (ctrl.type === 'momentary' || ctrl.type === 'toggle'),
+      };
       for (const cc of ctrl.ctrlIndex) {
-        this._ccMap[cc] = { constant: ctrl.constant, type: ctrl.type, hasLed };
+        this._ccMap[cc] = entry;
       }
       this._nameToCC[ctrl.constant] = ctrl.ctrlIndex[0];
     }
@@ -76,10 +80,10 @@ export class MidiController {
     return this._output !== null;
   }
 
-  /** True when the named control has a physical LED. */
-  hasLed(name: string): boolean {
+  /** Returns the control metadata for a given name, or undefined if unknown. */
+  getControl(name: string): InputControl | undefined {
     const cc = this._nameToCC[name];
-    return cc !== undefined ? this._ccMap[cc].hasLed : false;
+    return cc !== undefined ? this._ccMap[cc] : undefined;
   }
 
   // inputMode(RAW)            — set global raw mode
@@ -169,7 +173,7 @@ export class MidiController {
     this._prevValues[cc] = this._values[cc];
     this._values[cc] = rawValue;
 
-    this.input = ctrl.constant;
+    this.input = ctrl;
 
     const actions = this._p5 ? this._p5._customActions : null;
     if (!actions) return;
@@ -178,10 +182,10 @@ export class MidiController {
       // Report the immediate target value to the callback. When smoothing is
       // enabled, _interpolate() re-fires inputChanged each frame with the
       // smoothed value until the control settles.
-      this.value = this.getValue(ctrl.constant, { smoothed: false });
+      this.value = this.getValue(ctrl.name, { smoothed: false });
       if (typeof actions.inputChanged === 'function') actions.inputChanged.call(this._p5);
     } else {
-      this.value = this.getValue(ctrl.constant, { smoothed: false });
+      this.value = this.getValue(ctrl.name, { smoothed: false });
       const prev = this._prevValues[cc] ?? 0;
       if (rawValue > 0 && prev === 0) {
         if (typeof actions.buttonPressed === 'function') actions.buttonPressed.call(this._p5);
@@ -199,7 +203,7 @@ export class MidiController {
     const actions = this._p5 ? this._p5._customActions : null;
     for (const [ccKey, ctrl] of Object.entries(this._ccMap)) {
       const cc = Number(ccKey);
-      const smooth = this._smoothFor(ctrl.constant);
+      const smooth = this._smoothFor(ctrl.name);
       if (!smooth.enabled) continue;
 
       const target = this._values[cc] ?? this._defaultValue;
@@ -216,8 +220,8 @@ export class MidiController {
       // Re-dispatch inputChanged for continuous controls so callbacks that
       // read midi.value keep tracking the smoothed value.
       if (ctrl.type === 'continuous' && actions && typeof actions.inputChanged === 'function') {
-        this.input = ctrl.constant;
-        this.value = this.getValue(ctrl.constant);
+        this.input = ctrl;
+        this.value = this.getValue(ctrl.name);
         actions.inputChanged.call(this._p5);
       }
     }

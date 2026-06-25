@@ -205,7 +205,7 @@ function rotateHue(r, g, b, deg) {
 
 function inputChanged() {
   for (let i = 0; i < CHANNELS; i++) {
-    if (midi.input === window[`KNOB_${i + 1}`]) {
+    if (midi.input.name === `KNOB_${i + 1}`) {
       hueShift[i] = midi.value * 360;
     }
   }
@@ -214,32 +214,34 @@ function inputChanged() {
 function buttonPressed() {
   setHeld(true);
 
+  const inputName = midi.input.name;
+
   // REC_n toggles a single creature's sleep state.
   for (let i = 0; i < CHANNELS; i++) {
-    if (midi.input === window[`REC_${i + 1}`]) {
+    if (inputName === `REC_${i + 1}`) {
       awake[i] = !awake[i];
       midi.setLed(`REC_${i + 1}`, !awake[i]); // lit while asleep
     }
   }
 
-  if (midi.input === PLAY) {
+  if (inputName === PLAY) {
     playing = true;
     midi.setLed(PLAY, true);
     midi.setLed(STOP, false);
   }
-  if (midi.input === STOP) {
+  if (inputName === STOP) {
     playing = false;
     midi.setLed(PLAY, false);
     midi.setLed(STOP, true);
   }
 
-  if (midi.input === NEXT_MARKER) paletteOffset = ((paletteOffset - 1) % palettes[paletteIndex].length + palettes[paletteIndex].length) % palettes[paletteIndex].length;
-  if (midi.input === PREV_MARKER) paletteOffset = (paletteOffset + 1) % palettes[paletteIndex].length;
-  if (midi.input === PREV_TRACK) {
+  if (inputName === NEXT_MARKER) paletteOffset = ((paletteOffset - 1) % palettes[paletteIndex].length + palettes[paletteIndex].length) % palettes[paletteIndex].length;
+  if (inputName === PREV_MARKER) paletteOffset = (paletteOffset + 1) % palettes[paletteIndex].length;
+  if (inputName === PREV_TRACK) {
     paletteIndex = ((paletteIndex - 1) % palettes.length + palettes.length) % palettes.length;
     paletteOffset = 0;
   }
-  if (midi.input === NEXT_TRACK) {
+  if (inputName === NEXT_TRACK) {
     paletteIndex = (paletteIndex + 1) % palettes.length;
     paletteOffset = 0;
   }
@@ -252,8 +254,8 @@ function buttonReleased() {
 // Update the per-channel held state for SOLO/MUTE (hold-only) and mirror on LEDs.
 function setHeld(on) {
   for (let i = 0; i < CHANNELS; i++) {
-    if (midi.input === window[`SOLO_${i + 1}`]) { solo[i] = on; midi.setLed(`SOLO_${i + 1}`, on); }
-    if (midi.input === window[`MUTE_${i + 1}`]) { mute[i] = on; midi.setLed(`MUTE_${i + 1}`, on); }
+    if (midi.input.name === `SOLO_${i + 1}`) { solo[i] = on; midi.setLed(`SOLO_${i + 1}`, on); }
+    if (midi.input.name === `MUTE_${i + 1}`) { mute[i] = on; midi.setLed(`MUTE_${i + 1}`, on); }
   }
 }
 

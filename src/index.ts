@@ -8,9 +8,9 @@
 //
 //   let midi;
 //   function setup() { midi = new NanoKontrol2(); }
-//   function inputChanged() { if (midi.input === KNOB_1) hue = midi.value * 360; }
-//   function buttonPressed() { if (midi.input === PLAY) playing = true; }
-//   function buttonReleased() { if (midi.input === REC_1) recording = false; }
+//   function inputChanged() { if (midi.input.name === KNOB_1) hue = midi.value * 360; }
+//   function buttonPressed() { if (midi.input.name === PLAY) playing = true; }
+//   function buttonReleased() { if (midi.input.name === REC_1) recording = false; }
 //
 // See README.md for the full public API.
 

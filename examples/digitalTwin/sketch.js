@@ -6,13 +6,12 @@ let ui;
 const held = {};
 
 // Per-channel toggle state.
-const CH = {
+const TOGGLE_STATES = {
   SOLO: new Array(8).fill(false),
   MUTE: new Array(8).fill(false),
   REC:  new Array(8).fill(false),
 };
 
-const MOMENTARY = ['PLAY', 'STOP', 'REW', 'FF', 'REC', 'CYCLE', 'PREV_TRACK', 'NEXT_TRACK', 'SET_MARKER', 'PREV_MARKER', 'NEXT_MARKER'];
 
 async function setup() {
   noCanvas();
@@ -33,11 +32,13 @@ async function setup() {
 
 function syncLeds() {
   for (let i = 1; i <= 8; i++) {
-    for (const [name, state] of Object.entries(CH)) {
+    for (const [name, state] of Object.entries(TOGGLE_STATES)) {
       midi.setLed(`${name}_${i}`, state[i-1]);
     }
   }
-  for (const name of MOMENTARY) if (midi.hasLed(name)) midi.setLed(name, !!held[name]);
+  for (const name of Object.keys(held)) {
+    if (midi.getControl(name)?.hasLed) midi.setLed(name, !!held[name]);
+  }
 }
 
 // ── MIDI callbacks ────────────────────────────────────────────────────────────
@@ -51,45 +52,34 @@ function deviceDisconnected() {
 }
 
 function buttonPressed() {
-  const input = midi.input;
+  const { name, type, hasLed } = midi.input;
 
-  // Channel strip toggles (SOLO / MUTE / REC)
-  for (const [name, state] of Object.entries(CH)) {
-    for (let i = 1; i <= 8; i++) {
-      if (input !== `${name}_${i}`) continue;
-      state[i-1] = !state[i-1];
-      midi.setLed(input, state[i-1]);
-      ui.setChannelButton(name, i, state[i-1]);
-      return;
-    }
-  }
-
-  // Momentary buttons (transport + navigation)
-  for (const name of MOMENTARY) {
-    if (input !== name) continue;
-    held[name] = true;
-    if (midi.hasLed(name)) midi.setLed(name, true);
-    ui.pressButton(name);
+  if (type === 'toggle') {
+    const [group, idx] = [name.slice(0, -2), Number(name.slice(-1)) - 1];
+    TOGGLE_STATES[group][idx] = !TOGGLE_STATES[group][idx];
+    midi.setLed(name, TOGGLE_STATES[group][idx]);
+    ui.setChannelButton(group, idx + 1, TOGGLE_STATES[group][idx]);
     return;
+  } else {
+    held[name] = true;
+    if (hasLed) midi.setLed(name, true);
+    ui.pressButton(name);
   }
+
+  
 }
 
 function buttonReleased() {
-  const input = midi.input;
-
-  for (const name of MOMENTARY) {
-    if (input !== name) continue;
-    held[name] = false;
-    if (midi.hasLed(name)) midi.setLed(name, false);
-    ui.releaseButton(name);
-    return;
-  }
+  const { name, hasLed } = midi.input;
+  held[name] = false;
+  if (hasLed) midi.setLed(name, false);
+  ui.releaseButton(name);
 }
 
 function inputChanged() {
-  const input = midi.input;
+  const { name } = midi.input;
   for (let i = 1; i <= 8; i++) {
-    if (input === `KNOB_${i}`)   { ui.setKnob(i, midi.getValue(`KNOB_${i}`));   return; }
-    if (input === `SLIDER_${i}`) { ui.setFader(i, midi.getValue(`SLIDER_${i}`)); return; }
+    if (name === `KNOB_${i}`)   { ui.setKnob(i, midi.getValue(`KNOB_${i}`));   return; }
+    if (name === `SLIDER_${i}`) { ui.setFader(i, midi.getValue(`SLIDER_${i}`)); return; }
   }
 }
