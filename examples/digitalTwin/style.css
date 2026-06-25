@@ -1,5 +1,25 @@
-html, body { 
-    margin: 0; 
-    padding: 0; 
-    background: #1a1a1a; 
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background: #1a1a1a;
+}
+
+body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+main {
+    width: 100%;
+    max-width: 1000px;
+    padding: 1rem;
+    box-sizing: border-box;
+}
+
+main svg {
+    width: 100%;
+    height: auto;
+    display: block;
 }
