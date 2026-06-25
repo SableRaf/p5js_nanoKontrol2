@@ -75,12 +75,13 @@ class NanoKontrolUI {
     this.#channelBtns[name][i-1].elt.classList.toggle('active', active);
   }
 
-  // Transport buttons stay lit for as long as the button is held
-  pressTransport(name)   { this.#transport[name].elt.classList.add('active'); }
-  releaseTransport(name) { this.#transport[name].elt.classList.remove('active'); }
+  pressButton(name) {
+    if (this.#transport[name]) this.#transport[name].elt.classList.add('active');
+    else if (this.#nav[name]) this.#nav[name].elt.classList.add('held');
+  }
 
-  // Nav buttons have no LED on the hardware, so .held gives visual-only
-  // feedback without implying a latched state.
-  pressNav(name)   { this.#nav[name].elt.classList.add('held'); }
-  releaseNav(name) { this.#nav[name].elt.classList.remove('held'); }
+  releaseButton(name) {
+    if (this.#transport[name]) this.#transport[name].elt.classList.remove('active');
+    else if (this.#nav[name]) this.#nav[name].elt.classList.remove('held');
+  }
 }
