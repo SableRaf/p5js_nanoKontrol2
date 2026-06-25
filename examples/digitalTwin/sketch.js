@@ -118,19 +118,19 @@ function parameters() {
 }
 
 function navigation() {
-  drawPillBtn(27,  101, 38, 19, held['PREV_TRACK']);
+  drawPillBtn(27,  101, 38, 19, held['PREV_TRACK'],  true);
   drawTriLeft(46, 110);
 
-  drawPillBtn(76, 101, 38, 19, held['NEXT_TRACK']);
+  drawPillBtn(76,  101, 38, 19, held['NEXT_TRACK'],  true);
   drawTriRight(95, 110);
 
-  drawPillBtn(125, 141, 38, 19, held['SET_MARKER']);
+  drawPillBtn(125, 141, 38, 19, held['SET_MARKER'],  true);
   drawLabel(144, 150, 'SET');
 
-  drawPillBtn(174, 141, 38, 19, held['PREV_MARKER']);
+  drawPillBtn(174, 141, 38, 19, held['PREV_MARKER'], true);
   drawTriLeft(193, 150);
 
-  drawPillBtn(223, 141, 38, 19, held['NEXT_MARKER']);
+  drawPillBtn(223, 141, 38, 19, held['NEXT_MARKER'], true);
   drawTriRight(242, 150);
 }
 
@@ -177,11 +177,11 @@ function drawSquareBtn(x, y, w, h, r, active) {
   rect(x, y, w, h, r);
 }
 
-function drawPillBtn(x, y, w, h, active) {
+function drawPillBtn(x, y, w, h, active, noLed = false) {
   noStroke();
-  fill(active ? C.activeDim : C.btnFill);
+  fill(active && !noLed ? C.activeDim : C.btnFill);
   pill(x, y, w, h);
-  if (active) {
+  if (active && !noLed) {
     for (let t = 4; t > 0; t--) {
       stroke(255, 34, 34, t * 30);
       strokeWeight(t * 1.5);
@@ -189,10 +189,11 @@ function drawPillBtn(x, y, w, h, active) {
       pill(x, y, w, h);
     }
   }
-  stroke(active ? C.active : C.btnStroke);
-  strokeWeight(1);
+  stroke(active && !noLed ? C.active : C.btnStroke);
+  strokeWeight(active && noLed ? 2 : 1);
   noFill();
   pill(x, y, w, h);
+  strokeWeight(1);
 }
 
 function pill(x, y, w, h) {
@@ -241,14 +242,19 @@ function drawDoubleTriRight(cx, cy) {
 
 // ── LED sync ──────────────────────────────────────────────────────────────────
 
+// Navigation buttons have no LEDs — visual-only via held state.
+const NAV = ['PREV_TRACK', 'NEXT_TRACK', 'SET_MARKER', 'PREV_MARKER', 'NEXT_MARKER'];
+const TRANSPORT = ['PLAY', 'STOP', 'REW', 'FF', 'REC', 'CYCLE'];
+
+// ── LED sync ──────────────────────────────────────────────────────────────────
+
 function syncLeds() {
   for (let i = 1; i <= 8; i++) {
     midi.setLed(window[`SOLO_${i}`], solo[i-1]);
     midi.setLed(window[`MUTE_${i}`], mute[i-1]);
     midi.setLed(window[`REC_${i}`],  rec[i-1]);
   }
-  const momentary = ['PLAY','STOP','REW','FF','REC','CYCLE','PREV_TRACK','NEXT_TRACK','SET_MARKER','PREV_MARKER','NEXT_MARKER'];
-  for (const name of momentary) {
+  for (const name of TRANSPORT) {
     midi.setLed(window[name], !!held[name]);
   }
 }
@@ -262,17 +268,21 @@ function buttonPressed() {
     if (inp === window[`MUTE_${i}`]) { mute[i-1] = !mute[i-1]; midi.setLed(inp, mute[i-1]); return; }
     if (inp === window[`REC_${i}`])  { rec[i-1]  = !rec[i-1];  midi.setLed(inp, rec[i-1]);  return; }
   }
-  const momentary = ['PLAY','STOP','REW','FF','REC','CYCLE','PREV_TRACK','NEXT_TRACK','SET_MARKER','PREV_MARKER','NEXT_MARKER'];
-  for (const name of momentary) {
+  for (const name of TRANSPORT) {
     if (inp === window[name]) { held[name] = true; midi.setLed(inp, true); return; }
+  }
+  for (const name of NAV) {
+    if (inp === window[name]) { held[name] = true; return; }
   }
 }
 
 function buttonReleased() {
   const inp = midi.input;
-  const momentary = ['PLAY','STOP','REW','FF','REC','CYCLE','PREV_TRACK','NEXT_TRACK','SET_MARKER','PREV_MARKER','NEXT_MARKER'];
-  for (const name of momentary) {
+  for (const name of TRANSPORT) {
     if (inp === window[name]) { held[name] = false; midi.setLed(inp, false); return; }
+  }
+  for (const name of NAV) {
+    if (inp === window[name]) { held[name] = false; return; }
   }
 }
 
