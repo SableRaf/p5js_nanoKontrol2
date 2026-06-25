@@ -1,0 +1,198 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 234" width="1000" height="234">
+  <defs>
+    <style>
+      text         { font-family: sans-serif; }
+      .device-bg   { fill: #222222; stroke: #505050; stroke-width: 1; }
+      .btn-bg      { fill: #2a2a2a; stroke: #ffffff; stroke-width: 1; }
+      .btn-icon    { fill: #ffffff; }
+      .knob-bg     { fill: #333333; stroke: #ffffff; stroke-width: 1; }
+      .knob-line   { stroke: #ffffff; stroke-width: 2; stroke-linecap: round; }
+      .fader-track { fill: #333333; stroke: #ffffff; stroke-width: 1; }
+      .fader-thumb { fill: #cccccc; }
+      .led-bg      { fill: #3c3c3c; stroke: #ffffff; stroke-width: 1; }
+
+      /* Active: red glow for LED-backed buttons (channel toggles + transport) */
+      .active .btn-bg   { fill: #5a0000; stroke: #ff2222; filter: url(#btn-glow); }
+      .active .btn-icon { fill: #ff2222; }
+
+      /* Held: thicker border for nav buttons (no LED, visual-only) */
+      .held .btn-bg { stroke-width: 2; }
+
+      /* Power LED connected state */
+      .connected .led-bg { fill: #ffffff; filter: url(#led-glow); }
+    </style>
+
+    <!-- Red glow for active transport / channel buttons -->
+    <filter id="btn-glow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="3" result="blur"/>
+      <feFlood flood-color="#ff2222" flood-opacity="0.6" result="color"/>
+      <feComposite in="color" in2="blur" operator="in" result="red-glow"/>
+      <feMerge><feMergeNode in="red-glow"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+
+    <!-- White glow for power LED -->
+    <filter id="led-glow" x="-150%" y="-150%" width="400%" height="400%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Device body -->
+  <rect class="device-bg" x="1" y="1" width="998" height="232" rx="15"/>
+
+  <!-- Power LED -->
+  <g id="power-led">
+    <rect class="led-bg" x="15" y="15" width="20" height="6" rx="3"/>
+  </g>
+
+  <!-- ── Channel strips ──────────────────────────────────────────────────────
+       Local coords per channel: buttons at x=0 y=88/136/183, knob center
+       54,35, fader track at x=49 y=89. Channel groups translated to absolute
+       x positions: 292, 379, 466, 553, 640, 727, 814, 901.              -->
+
+  <g id="ch-1" transform="translate(292,0)">
+    <g id="solo-1" class="btn"><rect class="btn-bg" x="0" y="88" width="29" height="29" rx="5"/><text class="btn-icon" x="14" y="102" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="bold">S</text></g>
+    <g id="mute-1" class="btn"><rect class="btn-bg" x="0" y="136" width="29" height="29" rx="5"/><text class="btn-icon" x="14" y="150" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="bold">M</text></g>
+    <g id="rec-1"  class="btn"><rect class="btn-bg" x="0" y="183" width="29" height="29" rx="5"/><text class="btn-icon" x="14" y="197" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="bold">R</text></g>
+    <circle class="knob-bg" cx="54" cy="35" r="15.5"/>
+    <line class="knob-line" id="knob-1" x1="54" y1="35" x2="48.2" y2="45.5"/>
+    <rect class="fader-track" x="49" y="89" width="9" height="123" rx="4.5"/>
+    <rect class="fader-thumb" id="fader-1" x="49" y="200" width="9" height="12" rx="3"/>
+  </g>
+
+  <g id="ch-2" transform="translate(379,0)">
+    <g id="solo-2" class="btn"><rect class="btn-bg" x="0" y="88" width="29" height="29" rx="5"/><text class="btn-icon" x="14" y="102" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="bold">S</text></g>
+    <g id="mute-2" class="btn"><rect class="btn-bg" x="0" y="136" width="29" height="29" rx="5"/><text class="btn-icon" x="14" y="150" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="bold">M</text></g>
+    <g id="rec-2"  class="btn"><rect class="btn-bg" x="0" y="183" width="29" height="29" rx="5"/><text class="btn-icon" x="14" y="197" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="bold">R</text></g>
+    <circle class="knob-bg" cx="54" cy="35" r="15.5"/>
+    <line class="knob-line" id="knob-2" x1="54" y1="35" x2="48.2" y2="45.5"/>
+    <rect class="fader-track" x="49" y="89" width="9" height="123" rx="4.5"/>
+    <rect class="fader-thumb" id="fader-2" x="49" y="200" width="9" height="12" rx="3"/>
+  </g>
+
+  <g id="ch-3" transform="translate(466,0)">
+    <g id="solo-3" class="btn"><rect class="btn-bg" x="0" y="88" width="29" height="29" rx="5"/><text class="btn-icon" x="14" y="102" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="bold">S</text></g>
+    <g id="mute-3" class="btn"><rect class="btn-bg" x="0" y="136" width="29" height="29" rx="5"/><text class="btn-icon" x="14" y="150" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="bold">M</text></g>
+    <g id="rec-3"  class="btn"><rect class="btn-bg" x="0" y="183" width="29" height="29" rx="5"/><text class="btn-icon" x="14" y="197" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="bold">R</text></g>
+    <circle class="knob-bg" cx="54" cy="35" r="15.5"/>
+    <line class="knob-line" id="knob-3" x1="54" y1="35" x2="48.2" y2="45.5"/>
+    <rect class="fader-track" x="49" y="89" width="9" height="123" rx="4.5"/>
+    <rect class="fader-thumb" id="fader-3" x="49" y="200" width="9" height="12" rx="3"/>
+  </g>
+
+  <g id="ch-4" transform="translate(553,0)">
+    <g id="solo-4" class="btn"><rect class="btn-bg" x="0" y="88" width="29" height="29" rx="5"/><text class="btn-icon" x="14" y="102" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="bold">S</text></g>
+    <g id="mute-4" class="btn"><rect class="btn-bg" x="0" y="136" width="29" height="29" rx="5"/><text class="btn-icon" x="14" y="150" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="bold">M</text></g>
+    <g id="rec-4"  class="btn"><rect class="btn-bg" x="0" y="183" width="29" height="29" rx="5"/><text class="btn-icon" x="14" y="197" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="bold">R</text></g>
+    <circle class="knob-bg" cx="54" cy="35" r="15.5"/>
+    <line class="knob-line" id="knob-4" x1="54" y1="35" x2="48.2" y2="45.5"/>
+    <rect class="fader-track" x="49" y="89" width="9" height="123" rx="4.5"/>
+    <rect class="fader-thumb" id="fader-4" x="49" y="200" width="9" height="12" rx="3"/>
+  </g>
+
+  <g id="ch-5" transform="translate(640,0)">
+    <g id="solo-5" class="btn"><rect class="btn-bg" x="0" y="88" width="29" height="29" rx="5"/><text class="btn-icon" x="14" y="102" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="bold">S</text></g>
+    <g id="mute-5" class="btn"><rect class="btn-bg" x="0" y="136" width="29" height="29" rx="5"/><text class="btn-icon" x="14" y="150" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="bold">M</text></g>
+    <g id="rec-5"  class="btn"><rect class="btn-bg" x="0" y="183" width="29" height="29" rx="5"/><text class="btn-icon" x="14" y="197" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="bold">R</text></g>
+    <circle class="knob-bg" cx="54" cy="35" r="15.5"/>
+    <line class="knob-line" id="knob-5" x1="54" y1="35" x2="48.2" y2="45.5"/>
+    <rect class="fader-track" x="49" y="89" width="9" height="123" rx="4.5"/>
+    <rect class="fader-thumb" id="fader-5" x="49" y="200" width="9" height="12" rx="3"/>
+  </g>
+
+  <g id="ch-6" transform="translate(727,0)">
+    <g id="solo-6" class="btn"><rect class="btn-bg" x="0" y="88" width="29" height="29" rx="5"/><text class="btn-icon" x="14" y="102" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="bold">S</text></g>
+    <g id="mute-6" class="btn"><rect class="btn-bg" x="0" y="136" width="29" height="29" rx="5"/><text class="btn-icon" x="14" y="150" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="bold">M</text></g>
+    <g id="rec-6"  class="btn"><rect class="btn-bg" x="0" y="183" width="29" height="29" rx="5"/><text class="btn-icon" x="14" y="197" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="bold">R</text></g>
+    <circle class="knob-bg" cx="54" cy="35" r="15.5"/>
+    <line class="knob-line" id="knob-6" x1="54" y1="35" x2="48.2" y2="45.5"/>
+    <rect class="fader-track" x="49" y="89" width="9" height="123" rx="4.5"/>
+    <rect class="fader-thumb" id="fader-6" x="49" y="200" width="9" height="12" rx="3"/>
+  </g>
+
+  <g id="ch-7" transform="translate(814,0)">
+    <g id="solo-7" class="btn"><rect class="btn-bg" x="0" y="88" width="29" height="29" rx="5"/><text class="btn-icon" x="14" y="102" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="bold">S</text></g>
+    <g id="mute-7" class="btn"><rect class="btn-bg" x="0" y="136" width="29" height="29" rx="5"/><text class="btn-icon" x="14" y="150" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="bold">M</text></g>
+    <g id="rec-7"  class="btn"><rect class="btn-bg" x="0" y="183" width="29" height="29" rx="5"/><text class="btn-icon" x="14" y="197" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="bold">R</text></g>
+    <circle class="knob-bg" cx="54" cy="35" r="15.5"/>
+    <line class="knob-line" id="knob-7" x1="54" y1="35" x2="48.2" y2="45.5"/>
+    <rect class="fader-track" x="49" y="89" width="9" height="123" rx="4.5"/>
+    <rect class="fader-thumb" id="fader-7" x="49" y="200" width="9" height="12" rx="3"/>
+  </g>
+
+  <g id="ch-8" transform="translate(901,0)">
+    <g id="solo-8" class="btn"><rect class="btn-bg" x="0" y="88" width="29" height="29" rx="5"/><text class="btn-icon" x="14" y="102" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="bold">S</text></g>
+    <g id="mute-8" class="btn"><rect class="btn-bg" x="0" y="136" width="29" height="29" rx="5"/><text class="btn-icon" x="14" y="150" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="bold">M</text></g>
+    <g id="rec-8"  class="btn"><rect class="btn-bg" x="0" y="183" width="29" height="29" rx="5"/><text class="btn-icon" x="14" y="197" text-anchor="middle" dominant-baseline="central" font-size="13" font-weight="bold">R</text></g>
+    <circle class="knob-bg" cx="54" cy="35" r="15.5"/>
+    <line class="knob-line" id="knob-8" x1="54" y1="35" x2="48.2" y2="45.5"/>
+    <rect class="fader-track" x="49" y="89" width="9" height="123" rx="4.5"/>
+    <rect class="fader-thumb" id="fader-8" x="49" y="200" width="9" height="12" rx="3"/>
+  </g>
+
+  <!-- ── Navigation (absolute coords; no LED — only .held for visual feedback) -->
+
+  <g id="btn-prev-track" class="btn">
+    <rect class="btn-bg" x="27" y="101" width="38" height="19" rx="9.5"/>
+    <polygon class="btn-icon" points="40,110.5 50,104.5 50,116.5"/>
+  </g>
+
+  <g id="btn-next-track" class="btn">
+    <rect class="btn-bg" x="76" y="101" width="38" height="19" rx="9.5"/>
+    <polygon class="btn-icon" points="101,110.5 91,104.5 91,116.5"/>
+  </g>
+
+  <g id="btn-set-marker" class="btn">
+    <rect class="btn-bg" x="125" y="141" width="38" height="19" rx="9.5"/>
+    <text class="btn-icon" x="144" y="150.5" text-anchor="middle" dominant-baseline="central" font-size="7">SET</text>
+  </g>
+
+  <g id="btn-prev-marker" class="btn">
+    <rect class="btn-bg" x="174" y="141" width="38" height="19" rx="9.5"/>
+    <polygon class="btn-icon" points="187,150.5 197,144.5 197,156.5"/>
+  </g>
+
+  <g id="btn-next-marker" class="btn">
+    <rect class="btn-bg" x="223" y="141" width="38" height="19" rx="9.5"/>
+    <polygon class="btn-icon" points="248,150.5 238,144.5 238,156.5"/>
+  </g>
+
+  <!-- ── Transport (absolute coords) -->
+
+  <g id="btn-cycle" class="btn">
+    <rect class="btn-bg" x="27" y="141" width="38" height="19" rx="9.5"/>
+    <text class="btn-icon" x="46" y="150.5" text-anchor="middle" dominant-baseline="central" font-size="7">CYCLE</text>
+  </g>
+
+  <!-- REW: two left-pointing triangles -->
+  <g id="btn-rew" class="btn">
+    <rect class="btn-bg" x="28" y="180" width="36" height="36" rx="8"/>
+    <polygon class="btn-icon" points="38,198 46,192 46,204"/>
+    <polygon class="btn-icon" points="46,198 54,192 54,204"/>
+  </g>
+
+  <!-- FF: two right-pointing triangles -->
+  <g id="btn-ff" class="btn">
+    <rect class="btn-bg" x="77" y="180" width="36" height="36" rx="8"/>
+    <polygon class="btn-icon" points="103,198 95,192 95,204"/>
+    <polygon class="btn-icon" points="95,198  87,192 87,204"/>
+  </g>
+
+  <!-- STOP: filled square -->
+  <g id="btn-stop" class="btn">
+    <rect class="btn-bg" x="126" y="180" width="36" height="36" rx="8"/>
+    <rect class="btn-icon" x="138" y="192" width="12" height="12" rx="1"/>
+  </g>
+
+  <!-- PLAY: right-pointing triangle -->
+  <g id="btn-play" class="btn">
+    <rect class="btn-bg" x="175" y="180" width="36" height="36" rx="8"/>
+    <polygon class="btn-icon" points="199,198 189,192 189,204"/>
+  </g>
+
+  <!-- REC: filled circle -->
+  <g id="btn-rec" class="btn">
+    <rect class="btn-bg" x="224" y="180" width="36" height="36" rx="8"/>
+    <circle class="btn-icon" cx="242" cy="198" r="6.5"/>
+  </g>
+</svg>
