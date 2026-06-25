@@ -75,6 +75,13 @@ class NanoKontrolUI {
     this.#channelBtns[name][i-1].elt.classList.toggle('active', active);
   }
 
+  // controlName = e.g. 'SOLO_1', 'MUTE_3'
+  setChannelButtonByName(controlName, active) {
+    const group = controlName.slice(0, -2);
+    const i     = Number(controlName.slice(-1));
+    this.setChannelButton(group, i, active);
+  }
+
   pressButton(name) {
     if (this.#transport[name]) this.#transport[name].elt.classList.add('active');
     else if (this.#nav[name]) this.#nav[name].elt.classList.add('held');
