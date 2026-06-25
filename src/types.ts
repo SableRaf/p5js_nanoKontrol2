@@ -16,6 +16,8 @@ export interface Control {
   channel: number;
   /** Whether the control reports a continuous value, momentary value, or toggle state. */
   type: ControlType;
+  /** Whether the physical button has an LED. Defaults to true for momentary/toggle controls. */
+  hasLed?: boolean;
   /** Optional OSC-style parameter path, e.g. '/strip/1/fader'. */
   paramPath?: string;
   /** Minimum raw MIDI value (default 0). */

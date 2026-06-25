@@ -15,7 +15,7 @@ export class MidiController {
   private _def: ControllerDefinition;
   private _debugLogs: boolean;
 
-  private _ccMap: Record<number, { constant: string; type: ControlType }> = {};
+  private _ccMap: Record<number, { constant: string; type: ControlType; hasLed: boolean }> = {};
   private _nameToCC: Record<string, number> = {};
 
   /** Constant of the last-triggered control. */
@@ -57,8 +57,9 @@ export class MidiController {
 
     // Build CC ↔ name maps from the definition.
     for (const ctrl of definition.controls) {
+      const hasLed = ctrl.hasLed ?? (ctrl.type === 'momentary' || ctrl.type === 'toggle');
       for (const cc of ctrl.ctrlIndex) {
-        this._ccMap[cc] = { constant: ctrl.constant, type: ctrl.type };
+        this._ccMap[cc] = { constant: ctrl.constant, type: ctrl.type, hasLed };
       }
       this._nameToCC[ctrl.constant] = ctrl.ctrlIndex[0];
     }
@@ -73,6 +74,12 @@ export class MidiController {
   /** True when a MIDI output port for this device is available. */
   get isConnected(): boolean {
     return this._output !== null;
+  }
+
+  /** True when the named control has a physical LED. */
+  hasLed(name: string): boolean {
+    const cc = this._nameToCC[name];
+    return cc !== undefined ? this._ccMap[cc].hasLed : false;
   }
 
   // inputMode(RAW)            — set global raw mode
