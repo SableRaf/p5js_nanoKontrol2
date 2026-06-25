@@ -37,6 +37,8 @@ export class MidiController {
   private _output: any = null;
 
   private _onReady: (() => void) | undefined;
+  private _onConnected: (() => void) | undefined;
+  private _onDisconnected: (() => void) | undefined;
 
   /** Reference to the owning p5 instance (set by the addon factory). */
   _p5: any = null;
@@ -46,10 +48,12 @@ export class MidiController {
   // options    — { defaultValue, debugLogs }
   //   defaultValue — normalized 0..1 fallback before any input
   //   debugLogs    — when true, log raw MIDI events to the console
-  constructor(definition: ControllerDefinition, { defaultValue = 0, debugLogs = false, onReady }: MidiControllerOptions = {}) {
+  constructor(definition: ControllerDefinition, { defaultValue = 0, debugLogs = false, onReady, onConnected, onDisconnected }: MidiControllerOptions = {}) {
     this._def = definition;
     this._debugLogs = debugLogs;
     this._onReady = onReady;
+    this._onConnected = onConnected;
+    this._onDisconnected = onDisconnected;
 
     // Build CC ↔ name maps from the definition.
     for (const ctrl of definition.controls) {
@@ -65,6 +69,11 @@ export class MidiController {
   }
 
   // --- Public API --------------------------------------------------------
+
+  /** True when a MIDI output port for this device is available. */
+  get isConnected(): boolean {
+    return this._output !== null;
+  }
 
   // inputMode(RAW)            — set global raw mode
   // inputMode(KNOB_1, RAW)    — set per-control raw mode
@@ -225,15 +234,21 @@ export class MidiController {
       if (e.port.type === 'input') this._listenTo(e.port);
       if (e.port.type === 'output' && e.port.name.includes(this._def.model)) {
         this._output = e.port;
+        this._onConnected?.();
       }
     });
     WebMidi.addListener('disconnected', (e: any) => {
       if (this._debugLogs) console.log(`[nanokontrol2] disconnected: ${e.port.name}`);
+      if (e.port.name.includes(this._def.model)) {
+        if (e.port.type === 'output') this._output = null;
+        this._onDisconnected?.();
+      }
     });
 
     this._output = WebMidi.outputs.find((o: any) => o.name.includes(this._def.model)) ?? null;
 
     if (this._output) {
+      this._onConnected?.();
       this._ledStartupSequence().then(() => this._onReady?.());
     } else {
       this._onReady?.();
