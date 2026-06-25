@@ -1,17 +1,15 @@
 // KORG nanoKONTROL2 — interactive digital twin
 
+// This code assumes the SOLO, MUTE, and REC buttons are 
+// set to "momentary" in the KORG Kontrol Editor, and
+// that the LED mode is set to "external" (so the LEDs 
+// are controlled by the software, not the hardware).
+
 let midi;
 let ui;
 
-const held = {};
-
-// Per-channel toggle state.
-const TOGGLE_STATES = {
-  SOLO: new Array(8).fill(false),
-  MUTE: new Array(8).fill(false),
-  REC:  new Array(8).fill(false),
-};
-
+// Toggle state keyed by control name (e.g. 'SOLO_1').
+const TOGGLE_STATES = {};
 
 async function setup() {
   noCanvas();
@@ -31,13 +29,8 @@ async function setup() {
 // ── LED sync ──────────────────────────────────────────────────────────────────
 
 function syncLeds() {
-  for (let i = 1; i <= 8; i++) {
-    for (const [name, state] of Object.entries(TOGGLE_STATES)) {
-      midi.setLed(`${name}_${i}`, state[i-1]);
-    }
-  }
-  for (const name of Object.keys(held)) {
-    if (midi.getControl(name)?.hasLed) midi.setLed(name, !!held[name]);
+  for (const [name, on] of Object.entries(TOGGLE_STATES)) {
+    midi.setLed(name, on);
   }
 }
 
@@ -55,23 +48,18 @@ function buttonPressed() {
   const { name, type, hasLed } = midi.input;
 
   if (type === 'toggle') {
-    const [group, idx] = [name.slice(0, -2), Number(name.slice(-1)) - 1];
-    TOGGLE_STATES[group][idx] = !TOGGLE_STATES[group][idx];
-    midi.setLed(name, TOGGLE_STATES[group][idx]);
-    ui.setChannelButton(group, idx + 1, TOGGLE_STATES[group][idx]);
-    return;
+    TOGGLE_STATES[name] = !TOGGLE_STATES[name]; // toggle state keyed by control name (e.g. 'SOLO_1')
+    midi.setLed(name, TOGGLE_STATES[name]); // mirror on hardware LED
+    ui.setChannelButtonByName(name, TOGGLE_STATES[name]); // mirror on digital twin
   } else {
-    held[name] = true;
-    if (hasLed) midi.setLed(name, true);
+    if (hasLed) midi.setLed(name, true); // mirror on hardware LED
     ui.pressButton(name);
   }
-
-  
 }
 
 function buttonReleased() {
-  const { name, hasLed } = midi.input;
-  held[name] = false;
+  const { name, type, hasLed } = midi.input;
+  if (type === 'toggle') return; // ignore release events for toggle buttons
   if (hasLed) midi.setLed(name, false);
   ui.releaseButton(name);
 }
