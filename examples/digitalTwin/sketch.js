@@ -25,7 +25,17 @@ const C = {
 
 async function setup() {
   createCanvas(1000, 234);
-  midi = new NanoKontrol2({ debugLogs: false });
+  midi = new NanoKontrol2({
+    debugLogs: false,
+    onReady: syncLeds,
+  });
+
+  // Re-sync LEDs whenever the device reconnects (onReady only fires once at init).
+  WebMidi.addListener('connected', (e) => {
+    if (e.port.type === 'output' && e.port.name.includes('nanoKONTROL2')) {
+      syncLeds();
+    }
+  });
 }
 
 function draw() {
@@ -229,18 +239,32 @@ function drawDoubleTriRight(cx, cy) {
   triangle(cx,     cy, cx - 8, cy - 6, cx - 8, cy + 6);
 }
 
+// ── LED sync ──────────────────────────────────────────────────────────────────
+
+function syncLeds() {
+  for (let i = 1; i <= 8; i++) {
+    midi.setLed(window[`SOLO_${i}`], solo[i-1]);
+    midi.setLed(window[`MUTE_${i}`], mute[i-1]);
+    midi.setLed(window[`REC_${i}`],  rec[i-1]);
+  }
+  const momentary = ['PLAY','STOP','REW','FF','REC','CYCLE','PREV_TRACK','NEXT_TRACK','SET_MARKER','PREV_MARKER','NEXT_MARKER'];
+  for (const name of momentary) {
+    midi.setLed(window[name], !!held[name]);
+  }
+}
+
 // ── MIDI callbacks ────────────────────────────────────────────────────────────
 
 function buttonPressed() {
   const inp = midi.input;
   for (let i = 1; i <= 8; i++) {
-    if (inp === window[`SOLO_${i}`]) { solo[i-1] = !solo[i-1]; return; }
-    if (inp === window[`MUTE_${i}`]) { mute[i-1] = !mute[i-1]; return; }
-    if (inp === window[`REC_${i}`])  { rec[i-1]  = !rec[i-1];  return; }
+    if (inp === window[`SOLO_${i}`]) { solo[i-1] = !solo[i-1]; midi.setLed(inp, solo[i-1]); return; }
+    if (inp === window[`MUTE_${i}`]) { mute[i-1] = !mute[i-1]; midi.setLed(inp, mute[i-1]); return; }
+    if (inp === window[`REC_${i}`])  { rec[i-1]  = !rec[i-1];  midi.setLed(inp, rec[i-1]);  return; }
   }
   const momentary = ['PLAY','STOP','REW','FF','REC','CYCLE','PREV_TRACK','NEXT_TRACK','SET_MARKER','PREV_MARKER','NEXT_MARKER'];
   for (const name of momentary) {
-    if (inp === window[name]) { held[name] = true; return; }
+    if (inp === window[name]) { held[name] = true; midi.setLed(inp, true); return; }
   }
 }
 
@@ -248,7 +272,7 @@ function buttonReleased() {
   const inp = midi.input;
   const momentary = ['PLAY','STOP','REW','FF','REC','CYCLE','PREV_TRACK','NEXT_TRACK','SET_MARKER','PREV_MARKER','NEXT_MARKER'];
   for (const name of momentary) {
-    if (inp === window[name]) { held[name] = false; return; }
+    if (inp === window[name]) { held[name] = false; midi.setLed(inp, false); return; }
   }
 }
 
