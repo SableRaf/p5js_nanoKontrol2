@@ -37,9 +37,9 @@ function deviceConnected() {
 }
 
 function deviceDisconnected() {
-  resetToggleStates(); // clear toggle states so the next device connection starts fresh
-  ui.setAllLeds(false);
   ui.setPowerIndicator(false);
+  ui.setAllLeds(false);
+  resetToggleStates(); // clear toggle states so the next device connection starts fresh
 }
 
 function resetToggleStates() {
