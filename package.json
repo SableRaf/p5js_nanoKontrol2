@@ -28,6 +28,9 @@
     "controller"
   ],
   "license": "GPL-2.0-or-later",
+  "peerDependencies": {
+    "webmidi": "^3.0.0"
+  },
   "devDependencies": {
     "ts-loader": "^9.5.1",
     "typescript": "^5.4.0",
