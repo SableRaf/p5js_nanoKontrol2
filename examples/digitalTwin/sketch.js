@@ -20,15 +20,11 @@ async function setup() {
 
   midi = new NanoKontrol2({
     debugLogs: true,
-    onReady:        () => { syncLeds(); deviceConnected(); },
-    onConnected:    deviceConnected,
-    onDisconnected: deviceDisconnected,
+    onReady: syncLedToggledStates,
   });
 }
 
-// ── LED sync ──────────────────────────────────────────────────────────────────
-
-function syncLeds() {
+function syncLedToggledStates() {
   for (const [name, on] of Object.entries(TOGGLE_STATES)) {
     midi.setLed(name, on);
   }
@@ -37,11 +33,17 @@ function syncLeds() {
 // ── MIDI callbacks ────────────────────────────────────────────────────────────
 
 function deviceConnected() {
-  ui.setPowerLed(true);
+  ui.setPowerIndicator(true);
 }
 
 function deviceDisconnected() {
-  ui.setPowerLed(false);
+  resetToggleStates(); // clear toggle states so the next device connection starts fresh
+  ui.setAllLeds(false);
+  ui.setPowerIndicator(false);
+}
+
+function resetToggleStates() {
+  for (const name of Object.keys(TOGGLE_STATES)) TOGGLE_STATES[name] = false;
 }
 
 function buttonPressed() {
