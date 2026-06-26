@@ -171,22 +171,19 @@ export class MidiController {
 
     this.input = ctrl;
 
-    const actions = this._p5 ? this._p5._customActions : null;
-    if (!actions) return;
-
     if (ctrl.type === 'continuous') {
       // Report the immediate target value to the callback. When smoothing is
       // enabled, _interpolate() re-fires inputChanged each frame with the
       // smoothed value until the control settles.
       this.value = this.getValue(ctrl.name, { smoothed: false });
-      if (typeof actions.inputChanged === 'function') actions.inputChanged.call(this._p5);
+      this._dispatchAction('inputChanged');
     } else {
       this.value = this.getValue(ctrl.name, { smoothed: false });
       const prev = this._prevValues[cc] ?? 0;
       if (rawValue > 0 && prev === 0) {
-        if (typeof actions.buttonPressed === 'function') actions.buttonPressed.call(this._p5);
+        this._dispatchAction('buttonPressed');
       } else if (rawValue === 0 && prev > 0) {
-        if (typeof actions.buttonReleased === 'function') actions.buttonReleased.call(this._p5);
+        this._dispatchAction('buttonReleased');
       }
     }
   }
@@ -196,7 +193,6 @@ export class MidiController {
   // While a continuous control is still settling, re-fires inputChanged so
   // callback-driven sketch state tracks the smoothed value frame by frame.
   _interpolate(): void {
-    const actions = this._p5 ? this._p5._customActions : null;
     for (const [ccKey, ctrl] of Object.entries(this._ccMap)) {
       const cc = Number(ccKey);
       const smooth = this._smoothFor(ctrl.name);
@@ -215,10 +211,10 @@ export class MidiController {
 
       // Re-dispatch inputChanged for continuous controls so callbacks that
       // read midi.value keep tracking the smoothed value.
-      if (ctrl.type === 'continuous' && actions && typeof actions.inputChanged === 'function') {
+      if (ctrl.type === 'continuous') {
         this.input = ctrl;
         this.value = this.getValue(ctrl.name);
-        actions.inputChanged.call(this._p5);
+        this._dispatchAction('inputChanged');
       }
     }
   }
@@ -235,9 +231,11 @@ export class MidiController {
       .catch((err: Error) => console.error('p5.nanokontrol2: WebMidi:', err.message));
   }
 
-  private _dispatchAction(name: 'deviceConnected' | 'deviceDisconnected'): void {
-    const actions = this._p5 ? this._p5._customActions : null;
-    if (actions && typeof actions[name] === 'function') actions[name].call(this._p5);
+  private _dispatchAction(name: 'deviceConnected' | 'deviceDisconnected' | 'inputChanged' | 'buttonPressed' | 'buttonReleased'): void {
+    // Instance mode: the callback is a method on the sketch. Global mode: p5
+    // does not copy user functions onto the instance, so they live on window.
+    if (typeof this._p5?.[name] === 'function') this._p5[name]();
+    else if (typeof (window as any)[name] === 'function') (window as any)[name]();
   }
 
   private _onEnabled(): void {
