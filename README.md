@@ -2,23 +2,9 @@
 
 This is a [p5.js](https://p5js.org/) addon library for the [Korg nanoKONTROL2](https://www.korg.com/us/products/computergear/nanokontrol2/) MIDI controller, built on [WebMidi.js v3](https://webmidijs.org/).
 
-## Why this library?
-Web MIDI is a powerful API, but it can be a bit low-level and complicated for beginners, so I tried to design a simple API that feels at home in p5.js, with methods modeled after p5.js' own event functions.
+## Quick start guide
 
-The library adds a `NanoKontrol2` class to manage MIDI input from the device, as well as the `inputChanged()`, `buttonPressed()`, and `buttonReleased()` event functions for responding to control changes.
-
-## Why nanoKONTROL2?
-The [Korg nanoKONTROL2](https://www.korg.com/us/products/computergear/nanokontrol2/) is a popular, compact, and relatively affordable MIDI controller. That makes it a good fit for p5.js users who want to add physical controls to their sketches. 
-
-The library is designed specifically for the nanoKONTROL2's controls and MIDI messages, so it won't work with other devices out of the box. This is a choice to keep the API simple and focused, and because this is the only MIDI controller I own. 
-
-If there's interest in supporting more devices in the future, I could consider making a more generic version of the library or adding support for specific additional controllers.
-
-If you want to use a different MIDI controller with p5.js, you can use WebMidi.js directly.
-
-## Getting started
-
-Include the library after p5.js. The built file lives in `dist/`.
+Add `p5.nanokontrol2.js` to your HTML after p5.js and WebMidi.js, then create a `NanoKontrol2` instance in `setup()`:
 
 ```html
 <script src="https://cdn.jsdelivr.net/npm/webmidi@3/dist/iife/webmidi.iife.js"></script>
@@ -27,20 +13,42 @@ Include the library after p5.js. The built file lives in `dist/`.
 <script src="sketch.js"></script>
 ```
 
-Use `dist/p5.nanokontrol2.min.js` for the minified build.
-
-Create a `NanoKontrol2` in `setup()`:
+Here's a minimal sketch that changes the background color based on the first knob and starts/stops loop with the PLAY/STOP buttons:
 
 ```js
 let midi;
 
 function setup() {
-  createCanvas(windowWidth, windowHeight);
+  createCanvas(600, 600);
   midi = new NanoKontrol2();
+  background(176);
+}
+
+function buttonPressed() {
+  if (midi.input.name === 'PLAY') {
+    background("lime");
+    console.log('Play button pressed');
+  }
+  if (midi.input.name === 'STOP') {
+    background("red");
+    console.log('Stop button pressed');
+  }
 }
 ```
 
-Open `index.html` in a browser that supports Web MIDI (Chrome recommended) and grant MIDI access when prompted. The device is discovered automatically, including hot-plugging.
+## Why this library?
+Simply put, I have a nanoKONTROL2 and I wanted to use it in my p5.js sketches :)
+
+I also wanted to learn more about making a p5.js addon library, so I made this one. 
+
+## Why does it only work with the nanoKONTROL2?
+This is a choice to keep the API simple and focused, and because this is the only MIDI controller I own. 
+
+The Korg nanoKONTROL2 is a popular, compact, and relatively affordable MIDI controller. I think that makes it a good fit for p5.js users who want to add physical controls to their sketches. 
+
+If there's interest in supporting more devices in the future, I could consider making a more generic version of the library or adding support for specific additional controllers.
+
+For now, if you want to use a different MIDI controller with p5.js, you can use [WebMidi.js v3](https://webmidijs.org/) directly.
 
 ## Control names
 
@@ -62,13 +70,15 @@ Controls are referenced by ALL_CAPS constants, exposed as p5 globals.
 
 ## API
 
+I tried to design a simple API that feels at home in p5.js, with methods similar to p5.js' `mousePressed()` and `keyPressed()` event functions. The library adds a `NanoKontrol2` class to manage MIDI input from the device, as well as the `inputChanged()`, `buttonPressed()`, and `buttonReleased()` event functions for responding to control changes.
+
 ### Constructor
 
 ```js
-new NanoKontrol2({ debugLogs })
+new NanoKontrol2()
 ```
 
-To get detailed MIDI message logs in the console, pass `debugLogs: true` when creating the instance:
+To get detailed MIDI message logs in the console, pass the optional `debugLogs: true` when creating the instance:
 
 ```js
 midi = new NanoKontrol2({ debugLogs: true });
@@ -145,7 +155,7 @@ midi.inputMode(KNOB_1, RAW);  // only KNOB_1 reports 0..127
 
 Smoothing interpolates values toward their target each frame, removing jitter and creating gradual transitions. It runs automatically via a `predraw` lifecycle hook — **you do not need to call anything in `draw()`.** Both `midi.value` (in `inputChanged`) and `getValue()` reflect the smoothed value while it is active.
 
-#### `setSmooth({ inputName, enabled, easingType, duration })`
+`setSmooth({ inputName, enabled, easingType, duration })`
 
 | Option | Type | Default | Description |
 |---|---|---|---|
@@ -182,9 +192,9 @@ The nanoKONTROL2 can drive its button LEDs from the host when set to **External 
 #### `setLed(name, on)`
 
 ```js
-midi.setLed(PLAY, true);   // turn PLAY LED on
-midi.setLed(STOP, false);  // turn STOP LED off
-midi.setLed(SOLO_1, true); // works for any named button
+midi.setLed('PLAY', true);   // turn PLAY LED on
+midi.setLed('STOP', false);  // turn STOP LED off
+midi.setLed('SOLO_1', true); // works for any named button
 ```
 
 `name` must be one of the button constants. 
