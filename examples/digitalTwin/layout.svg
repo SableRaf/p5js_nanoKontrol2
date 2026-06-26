@@ -16,8 +16,8 @@
       .active .btn-icon { fill: #ff2222; }
 
       /* Held: thicker border for nav buttons (no LED, visual-only) */
-      .held .btn-bg { stroke-width: 2; }
-
+      .held .btn-bg { stroke-width: 3; }
+4
       /* Power LED connected state */
       .connected .led-bg { fill: #ffffff; filter: url(#led-glow); }
     </style>
