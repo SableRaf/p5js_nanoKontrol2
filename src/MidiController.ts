@@ -247,6 +247,8 @@ export class MidiController {
       if (e.port.type === 'output' && e.port.name.includes(this._def.model)) {
         this._output = e.port;
         this._dispatchAction('deviceConnected');
+        // Wait for the device's built-in startup flash to finish before running ours.
+        setTimeout(() => this._ledStartupSequence(), 1500);
       }
     });
     WebMidi.addListener('disconnected', (e: any) => {
