@@ -42,7 +42,7 @@ The last-triggered control, as an object `{ name, type, hasLed }`. Use it inside
 
 ```js
 function inputChanged() {
-  if (midi.input === KNOB_1) hue = midi.value * 360;
+  if (midi.input.name === KNOB_1) hue = midi.value * 360;
 }
 ```
 
@@ -69,8 +69,8 @@ Called whenever a knob or slider moves. When smoothing is enabled, it is also re
 
 ```js
 function inputChanged() {
-  if (midi.input === KNOB_1) hue = midi.value * 360;
-  if (midi.input === SLIDER_1) radius = midi.value;
+  if (midi.input.name === KNOB_1) hue = midi.value * 360;
+  if (midi.input.name === SLIDER_1) radius = midi.value;
 }
 ```
 
@@ -80,8 +80,8 @@ Called once when a button is pressed.
 
 ```js
 function buttonPressed() {
-  if (midi.input === PLAY) playing = true;
-  if (midi.input === STOP) playing = false;
+  if (midi.input.name === PLAY) playing = true;
+  if (midi.input.name === STOP) playing = false;
 }
 ```
 
@@ -91,7 +91,7 @@ Called once when a button is released.
 
 ```js
 function buttonReleased() {
-  if (midi.input === REC_1) recording = false;
+  if (midi.input.name === REC_1) recording = false;
 }
 ```
 
