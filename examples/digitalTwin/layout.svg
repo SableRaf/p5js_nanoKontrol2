@@ -57,7 +57,7 @@
     <circle class="knob-bg" cx="54" cy="35" r="15.5"/>
     <line class="knob-line" id="knob-1" x1="54" y1="35" x2="48.2" y2="45.5"/>
     <rect class="fader-track" x="49" y="89" width="9" height="123" rx="4.5"/>
-    <rect class="fader-thumb" id="fader-1" x="49" y="200" width="9" height="12" rx="3"/>
+    <rect class="fader-thumb" id="fader-1" x="39" y="200" width="30" height="12" rx="3"/>
   </g>
 
   <g id="ch-2" transform="translate(379,0)">
@@ -67,7 +67,7 @@
     <circle class="knob-bg" cx="54" cy="35" r="15.5"/>
     <line class="knob-line" id="knob-2" x1="54" y1="35" x2="48.2" y2="45.5"/>
     <rect class="fader-track" x="49" y="89" width="9" height="123" rx="4.5"/>
-    <rect class="fader-thumb" id="fader-2" x="49" y="200" width="9" height="12" rx="3"/>
+    <rect class="fader-thumb" id="fader-2" x="39" y="200" width="30" height="12" rx="3"/>
   </g>
 
   <g id="ch-3" transform="translate(466,0)">
@@ -77,7 +77,7 @@
     <circle class="knob-bg" cx="54" cy="35" r="15.5"/>
     <line class="knob-line" id="knob-3" x1="54" y1="35" x2="48.2" y2="45.5"/>
     <rect class="fader-track" x="49" y="89" width="9" height="123" rx="4.5"/>
-    <rect class="fader-thumb" id="fader-3" x="49" y="200" width="9" height="12" rx="3"/>
+    <rect class="fader-thumb" id="fader-3" x="39" y="200" width="30" height="12" rx="3"/>
   </g>
 
   <g id="ch-4" transform="translate(553,0)">
@@ -87,7 +87,7 @@
     <circle class="knob-bg" cx="54" cy="35" r="15.5"/>
     <line class="knob-line" id="knob-4" x1="54" y1="35" x2="48.2" y2="45.5"/>
     <rect class="fader-track" x="49" y="89" width="9" height="123" rx="4.5"/>
-    <rect class="fader-thumb" id="fader-4" x="49" y="200" width="9" height="12" rx="3"/>
+    <rect class="fader-thumb" id="fader-4" x="39" y="200" width="30" height="12" rx="3"/>
   </g>
 
   <g id="ch-5" transform="translate(640,0)">
@@ -97,7 +97,7 @@
     <circle class="knob-bg" cx="54" cy="35" r="15.5"/>
     <line class="knob-line" id="knob-5" x1="54" y1="35" x2="48.2" y2="45.5"/>
     <rect class="fader-track" x="49" y="89" width="9" height="123" rx="4.5"/>
-    <rect class="fader-thumb" id="fader-5" x="49" y="200" width="9" height="12" rx="3"/>
+    <rect class="fader-thumb" id="fader-5" x="39" y="200" width="30" height="12" rx="3"/>
   </g>
 
   <g id="ch-6" transform="translate(727,0)">
@@ -107,7 +107,7 @@
     <circle class="knob-bg" cx="54" cy="35" r="15.5"/>
     <line class="knob-line" id="knob-6" x1="54" y1="35" x2="48.2" y2="45.5"/>
     <rect class="fader-track" x="49" y="89" width="9" height="123" rx="4.5"/>
-    <rect class="fader-thumb" id="fader-6" x="49" y="200" width="9" height="12" rx="3"/>
+    <rect class="fader-thumb" id="fader-6" x="39" y="200" width="30" height="12" rx="3"/>
   </g>
 
   <g id="ch-7" transform="translate(814,0)">
@@ -117,7 +117,7 @@
     <circle class="knob-bg" cx="54" cy="35" r="15.5"/>
     <line class="knob-line" id="knob-7" x1="54" y1="35" x2="48.2" y2="45.5"/>
     <rect class="fader-track" x="49" y="89" width="9" height="123" rx="4.5"/>
-    <rect class="fader-thumb" id="fader-7" x="49" y="200" width="9" height="12" rx="3"/>
+    <rect class="fader-thumb" id="fader-7" x="39" y="200" width="30" height="12" rx="3"/>
   </g>
 
   <g id="ch-8" transform="translate(901,0)">
@@ -127,7 +127,7 @@
     <circle class="knob-bg" cx="54" cy="35" r="15.5"/>
     <line class="knob-line" id="knob-8" x1="54" y1="35" x2="48.2" y2="45.5"/>
     <rect class="fader-track" x="49" y="89" width="9" height="123" rx="4.5"/>
-    <rect class="fader-thumb" id="fader-8" x="49" y="200" width="9" height="12" rx="3"/>
+    <rect class="fader-thumb" id="fader-8" x="39" y="200" width="30" height="12" rx="3"/>
   </g>
 
   <!-- ── Navigation (absolute coords; no LED — only .held for visual feedback) -->
