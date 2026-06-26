@@ -21,17 +21,10 @@ new NanoKontrol2({ debugLogs: true })
 
 Controls are referenced by ALL_CAPS string constants, exposed as p5 globals.
 
-### Sliders & knobs
-`SLIDER_1`–`SLIDER_8`, `KNOB_1`–`KNOB_8`
-
-### Parameter buttons (have LEDs)
-`SOLO_1`–`SOLO_8`, `MUTE_1`–`MUTE_8`, `REC_1`–`REC_8`
-
-### Transport buttons (have LEDs)
-`PLAY`, `STOP`, `REW`, `FF`, `REC`, `CYCLE`
-
-### Function buttons (no LEDs)
-`PREV_TRACK`, `NEXT_TRACK`, `SET_MARKER`, `PREV_MARKER`, `NEXT_MARKER`
+- **Sliders & knobs:** `SLIDER_1` to `SLIDER_8`, `KNOB_1` to `KNOB_8`
+- **Parameter buttons:** `SOLO_1` to `SOLO_8`, `MUTE_1` to `MUTE_8`, `REC_1` to `REC_8`
+- **Transport buttons:** `PLAY`, `STOP`, `REW`, `FF`, `REC`, `CYCLE`
+- **Function buttons:** `PREV_TRACK`, `NEXT_TRACK`, `SET_MARKER`, `PREV_MARKER`, `NEXT_MARKER`
 
 
 ## Properties
@@ -43,6 +36,16 @@ The last-triggered control, as an object `{ name, type, hasLed }`. Use it inside
 ```js
 function inputChanged() {
   if (midi.input.name === KNOB_1) hue = midi.value * 360;
+}
+```
+
+Or, when iterating over numbered controls, you can compare `midi.input.name` against a string name directly:
+
+```js
+function inputChanged() {
+  for (let i = 0; i < 8; i++) {
+    if (midi.input.name === `SLIDER_${i + 1}`) { ... }
+  }
 }
 ```
 
