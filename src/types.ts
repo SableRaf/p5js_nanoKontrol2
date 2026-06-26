@@ -51,10 +51,6 @@ export interface MidiControllerOptions {
   debugLogs?: boolean;
   /** Called once the MIDI port is connected and the startup LED sequence has finished. */
   onReady?: () => void;
-  /** Called whenever the device is connected (including at startup). */
-  onConnected?: () => void;
-  /** Called whenever the device is disconnected. */
-  onDisconnected?: () => void;
 }
 
 export interface SmoothConfig {
