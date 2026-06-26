@@ -1,4 +1,4 @@
-// Move the first linear fader up and down to change the size of the square
+// Move the first vertical slider up and down to change the size of the square
 
 let midi;
 
