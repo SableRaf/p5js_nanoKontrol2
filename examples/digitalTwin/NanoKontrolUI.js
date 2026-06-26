@@ -64,8 +64,14 @@ class NanoKontrolUI {
 
   // The power LED reflects WebMidi output availability, not just whether the
   // page loaded — it turns off if the device is unplugged mid-session.
-  setPowerLed(isConnected) {
+  setPowerIndicator(isConnected) {
     this.#powerLed.elt.classList.toggle('connected', isConnected);
+  }
+
+  setAllLeds(on) {
+    for (const [name, btns] of Object.entries(this.#channelBtns)) {
+      for (let i = 1; i <= btns.length; i++) this.setChannelButton(name, i, on);
+    }
   }
 
   // classList is used directly because p5's addClass/removeClass writes to
