@@ -15,10 +15,10 @@ function setup() {
 }
 
 function buttonPressed() {
-  const { name, hasLed } = midi.input;
+  const { name: inputName, hasLed } = midi.input;
   
   // Turn off all LEDs when the SET button is pressed
-  if( name === 'SET_MARKER'){
+  if( inputName === SET_MARKER){
     midi.setAllLeds(false);
   }
   
@@ -26,7 +26,7 @@ function buttonPressed() {
   if (!hasLed) return;
 
   // Toggle the LED state for the button that was pressed
-  midi.setLed(name, true);
+  midi.setLed(inputName, true);
 }
 
 function drawCaption(s){

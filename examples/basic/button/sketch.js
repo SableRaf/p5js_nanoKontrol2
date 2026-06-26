@@ -27,15 +27,15 @@ function drawCaption(s){
 }
 
 function buttonPressed() {
-  const { name } = midi.input;
+  const inputName = midi.input.name;
   
-  if (name === 'PLAY') {
+  if (inputName === PLAY) {
     console.log('PLAY button pressed');
     caption = 'PLAY button pressed!';
     background(playColor);
   }
-  
-  if (name === 'STOP') {
+
+  if (inputName === STOP) {
     console.log('STOP button pressed');
     caption = 'STOP button pressed!';
     background(stopColor);

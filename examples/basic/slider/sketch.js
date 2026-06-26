@@ -20,8 +20,8 @@ function draw() {
 }
 
 function inputChanged() {
-  if (midi.input.name === 'SLIDER_1') {
-    size = map(midi.getValue('SLIDER_1'), 0, 1, 50, min(width, height) * 0.6);
-    console.log('Slider 1 value:', midi.getValue('SLIDER_1'));
+  if (midi.input.name === SLIDER_1) {
+    size = map(midi.getValue(SLIDER_1), 0, 1, 50, min(width, height) * 0.6);
+    console.log('Slider 1 value:', midi.getValue(SLIDER_1));
   }
 }
