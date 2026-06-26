@@ -111,6 +111,12 @@ export class MidiController {
     this._output.sendControlChange(cc, on ? 127 : 0);
   }
 
+  setAllLeds(state: boolean): void {
+    for (const name of Object.keys(this._nameToCC)) {
+      this.setLed(name, state);
+    }
+  }
+
   // Configure smoothing globally, or for specific input(s).
   //   inputName  — name string or array of names; omit to set globally
   //   enabled    — true/false (default true)
