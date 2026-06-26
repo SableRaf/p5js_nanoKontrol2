@@ -30,6 +30,10 @@ function syncLedToggledStates() {
   }
 }
 
+function resetToggleStates() {
+  for (const name of Object.keys(TOGGLE_STATES)) TOGGLE_STATES[name] = false;
+}
+
 // ── MIDI callbacks ────────────────────────────────────────────────────────────
 
 function deviceConnected() {
@@ -40,10 +44,6 @@ function deviceDisconnected() {
   ui.setPowerIndicator(false);
   ui.setAllLeds(false);
   resetToggleStates(); // clear toggle states so the next device connection starts fresh
-}
-
-function resetToggleStates() {
-  for (const name of Object.keys(TOGGLE_STATES)) TOGGLE_STATES[name] = false;
 }
 
 function buttonPressed() {
