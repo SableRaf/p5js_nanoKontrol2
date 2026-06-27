@@ -29,7 +29,7 @@ const palettes = [
 const status = {
   "device-connected": { label: "nanoKONTROL2 connected",                type: "ok",      pulse: false },
   "no-device":        { label: "nanoKONTROL2 not found",                type: "error",   pulse: true  },
-  "no-webmidi":       { label: "WebMIDI not supported in this browser", type: "error",   pulse: false },
+  "no-webmidi":       { label: "WebMIDI is not supported in this browser", type: "error",   pulse: false },
   "connection-lost":  { label: "nanoKONTROL2 connection lost",          type: "warning", pulse: false  },
 }
 
