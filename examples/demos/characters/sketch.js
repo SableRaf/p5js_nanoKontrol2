@@ -1,6 +1,4 @@
 // A row of eight characters, one per nanoKONTROL2 channel.
-// Each character is the exact character from the original sketch — only its
-// hue changes per channel.
 //
 //   SLIDER_n    -> how high the character floats (0 = low, 1 = high)
 //   KNOB_n      -> the character's hue shift (on top of palette color)
