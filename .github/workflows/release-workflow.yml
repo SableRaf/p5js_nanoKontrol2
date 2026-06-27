@@ -1,0 +1,75 @@
+name: Release
+
+# Auth happens via OIDC trusted publishing (No NPM_TOKEN needed)
+# Requires the npm package to already exist with a Trusted Publisher
+# configured (via `npm trust github`) pointing at this exact repo +
+# workflow filename: release-workflow.yml
+
+# GITHUB_TOKEN is provided automatically by Actions.
+
+permissions:
+  contents: write   # needed to create the GitHub release
+  id-token: write   # needed to mint the OIDC token npm uses for auth
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'      # v0.1.0
+      - 'v*.*.*-*'    # v0.1.0-rc.0  (prereleases)
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    name: Release
+    steps:
+      # 1. Setup
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+
+      - name: Update npm
+        run: npm install -g npm@latest   # OIDC trusted publishing needs npm >=11.5.1
+
+      - name: Detect prerelease
+        id: semver
+        shell: bash
+        run: |
+          if [[ "${{ github.ref_name }}" == *"-"* ]]; then
+            echo "is-prerelease=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "is-prerelease=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Build
+        run: npm run build   # build:prod + build:dev + build:types
+
+      # 2. Publish to npm via OIDC
+      - name: Publish to npm
+        run: npm publish --tag ${{ steps.semver.outputs.is-prerelease == 'true' && 'beta' || 'latest' }}
+        # npm CLI detects the GitHub Actions OIDC environment
+        #  automatically and exchanges it for a short-lived
+        # publish token, matched against the trusted publisher
+        # config for this repo + this workflow filename.
+
+      # 3. Attach built files to a GitHub release
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          draft: true
+          prerelease: ${{ steps.semver.outputs.is-prerelease == 'true' }}
+          files: |
+            dist/p5.nanokontrol2.js
+            dist/p5.nanokontrol2.min.js
+          generate_release_notes: true
+          token: ${{ secrets.GITHUB_TOKEN }}
