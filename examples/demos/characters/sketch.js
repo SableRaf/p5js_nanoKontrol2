@@ -53,8 +53,10 @@ const charY = new Array(CHANNELS).fill(null); // current eased vertical position
 function setup() {
   createCanvas(windowWidth, windowHeight);
 
+  if (typeof WebMidi === 'undefined' || typeof navigator.requestMIDIAccess !== 'function') {
+    midiStatus = "no-webmidi";
+  }
   midi = new NanoKontrol2({ onReady() { midi.setLed(PLAY, true); }});
-  if (typeof WebMidi === 'undefined') midiStatus = "no-webmidi";
 
   // midi.setSmooth({ enabled: true, easingType: 'easeOut', duration: 400 });
 
