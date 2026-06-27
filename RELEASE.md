@@ -15,8 +15,10 @@
 
 2. **Push the commit and tag:**
    ```sh
-   git push origin main --follow-tags
+   git push origin main
+   git push origin --tags
    ```
+   > Push the tag explicitly. `--follow-tags` silently skips the tag when `main` has nothing new to push.
 
 3. **CI takes over** — the `release-workflow.yml` workflow runs automatically:
    - Typechecks and builds the library
