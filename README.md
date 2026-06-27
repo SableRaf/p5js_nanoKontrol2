@@ -2,7 +2,15 @@
 
 A p5.js addon library for the Korg nanoKONTROL2 MIDI controller.
 
-Demo sketch: https://openprocessing.org/@SableRaph/2973319
+![Layout of the nanoKONTROL2](https://raw.githubusercontent.com/SableRaf/p5js_nanoKontrol2/main/examples/demos/digitalTwin/layout.svg)
+
+More about the nanoKONTROL2 on the [Korg website](https://www.korg.com/us/products/computergear/nanokontrol2/).
+
+## Demo
+
+If you already have a nanoKONTROL2, you can try the demo sketch on OpenProcessing:
+
+https://openprocessing.org/@SableRaph/2973319
 
 ![Demo screenshot](https://raw.githubusercontent.com/SableRaf/p5js_nanoKontrol2/main/demo.png)
 
