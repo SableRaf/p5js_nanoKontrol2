@@ -1,7 +1,7 @@
 {
   "name": "p5.nanokontrol2",
   "version": "0.1.0",
-  "description": "A p5.js addon library for the KORG nanoKONTROL2 (and other MIDI control surfaces) using WebMidi.js v3.",
+  "description": "A p5.js addon library for the KORG nanoKONTROL2",
   "main": "dist/p5.nanokontrol2.js",
   "types": "dist/types/index.d.ts",
   "files": [
