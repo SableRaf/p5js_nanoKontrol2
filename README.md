@@ -2,6 +2,8 @@
 
 A [p5.js](https://p5js.org/) addon library for the [Korg nanoKONTROL2](https://www.korg.com/us/products/computergear/nanokontrol2/) MIDI controller, built on [WebMidi.js v3](https://webmidijs.org/).
 
+![Demo screenshot](https://raw.githubusercontent.com/SableRaf/p5js_nanoKontrol2/main/demo.png)
+
 ## Quick start
 
 Add the scripts to your HTML after p5.js and WebMidi.js:
