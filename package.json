@@ -10,6 +10,10 @@
     "scripts",
     "README.md"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SableRaf/p5js_nanoKontrol2.git"
+  },
   "scripts": {
     "build": "npm run build:prod && npm run build:dev && npm run build:types",
     "build:dev": "webpack --mode development",
