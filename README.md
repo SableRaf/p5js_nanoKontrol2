@@ -9,7 +9,7 @@ Add the scripts to your HTML after p5.js and WebMidi.js:
 ```html
 <script src="https://cdn.jsdelivr.net/npm/webmidi@3/dist/iife/webmidi.iife.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/p5@2.3.0/lib/p5.min.js"></script>
-<script src="dist/p5.nanokontrol2.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/p5.nanokontrol2@0.1.1/dist/p5.nanokontrol2.js"></script>
 <script src="sketch.js"></script>
 ```
 
