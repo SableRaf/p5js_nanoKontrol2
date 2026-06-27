@@ -1,4 +1,4 @@
-# p5.nanokontrol2 — API Reference
+# p5.nanokontrol2 API Reference
 
 ## Constructor
 
@@ -134,7 +134,7 @@ midi.getValue(SLIDER_1, { defaultValue: 0.5 }); // 0.5 before first touch
 
 | Option | Type | Default | Description |
 |---|---|---|---|
-| `defaultValue` | `number` (0–1) | `0` | Returned for a control that has not yet received any message — avoids a snap from zero on first touch. |
+| `defaultValue` | `number` (0–1) | `0` | Returned for a control that has not yet received any message instead of snapping to zero on first touch |
 | `smoothed` | `boolean` | `true` | When `false`, returns the immediate target value, bypassing smoothing. |
 
 Returns `0..1` by default, or `0..127` in [RAW mode](#inputmode).
