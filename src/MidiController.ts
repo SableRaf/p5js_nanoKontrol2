@@ -2,6 +2,7 @@
 
 import { MIDI_CC_MAX, RAW } from './constants';
 import { EASING, durationToSpeed } from './smoothing';
+import { StatusBanner } from './StatusBanner';
 import type {
   ControllerDefinition,
   GetValueOptions,
@@ -38,6 +39,9 @@ export class MidiController {
 
   private _onReady: (() => void) | undefined;
 
+  /** Optional on-screen connection status banner (enabled via statusLabel). */
+  private _statusBanner: StatusBanner | null = null;
+
   /** Reference to the owning p5 instance (set by the addon factory). */
   _p5: any = null;
   _predrawLogged = false;
@@ -46,10 +50,12 @@ export class MidiController {
   // options    — { defaultValue, debugLogs }
   //   defaultValue — normalized 0..1 fallback before any input
   //   debugLogs    — when true, log raw MIDI events to the console
-  constructor(definition: ControllerDefinition, { defaultValue = 0, debugLogs = false, onReady }: MidiControllerOptions = {}) {
+  //   statusLabel  — when true, inject an on-screen connection status banner
+  constructor(definition: ControllerDefinition, { defaultValue = 0, debugLogs = false, statusLabel = false, onReady }: MidiControllerOptions = {}) {
     this._def = definition;
     this._debugLogs = debugLogs;
     this._onReady = onReady;
+    if (statusLabel) this._statusBanner = new StatusBanner(definition.model);
 
     // Build CC ↔ name maps from the definition.
     for (const ctrl of definition.controls) {
@@ -234,6 +240,7 @@ export class MidiController {
     }
     if (typeof navigator.requestMIDIAccess !== 'function') {
       console.warn('p5.nanokontrol2: WebMIDI is not supported in this browser');
+      this._statusBanner?.noWebMidi();
       return;
     }
     WebMidi.enable()
@@ -242,6 +249,10 @@ export class MidiController {
   }
 
   private _dispatchAction(name: 'deviceConnected' | 'deviceDisconnected' | 'inputChanged' | 'buttonPressed' | 'buttonReleased'): void {
+    // Keep the optional status banner in sync with the connection lifecycle.
+    if (name === 'deviceConnected') this._statusBanner?.connected();
+    else if (name === 'deviceDisconnected') this._statusBanner?.disconnected();
+
     // Instance mode: the callback is a method on the sketch. Global mode: p5
     // does not copy user functions onto the instance, so they live on window.
     if (typeof this._p5?.[name] === 'function') this._p5[name]();

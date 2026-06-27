@@ -49,6 +49,8 @@ export interface MidiControllerOptions {
   defaultValue?: number;
   /** When true, log raw MIDI events to the console. */
   debugLogs?: boolean;
+  /** When true, inject an on-screen connection status banner (no HTML/CSS needed). */
+  statusLabel?: boolean;
   /** Called once the MIDI port is connected and the startup LED sequence has finished. */
   onReady?: () => void;
 }

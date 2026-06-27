@@ -14,6 +14,9 @@ new NanoKontrol2({ debugLogs: true })
 | Option | Type | Default | Description |
 |---|---|---|---|
 | `debugLogs` | `boolean` | `false` | Log raw MIDI events and lifecycle messages to the console. |
+| `statusLabel` | `boolean` | `false` | Inject an on-screen connection status banner. No HTML or CSS needed — the library creates and updates it from the connection lifecycle (connected / not found / lost / WebMIDI unsupported). |
+| `defaultValue` | `number` | `0` | Normalized 0..1 fallback value returned before any input arrives. |
+| `onReady` | `function` | — | Called once the device is connected and the startup LED sequence finishes. |
 
 ---
 

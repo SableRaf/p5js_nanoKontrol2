@@ -18,7 +18,7 @@ async function setup() {
   await ui.load();
   ui.resetKnobs();
 
-  midi = new NanoKontrol2({ debugLogs: true});
+  midi = new NanoKontrol2({ debugLogs: true, statusLabel: true });
 }
 
 function syncLedToggledStates() {
