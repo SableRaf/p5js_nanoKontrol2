@@ -28,6 +28,17 @@ const palettes = [
   ["#F59FAC", "#F2C800", "#72ADDC", "#BC71BA", "#62B100", "#F5B200", "#CC530A"] // Waxy Corn, Dark Orange
 ]
 
+const status = {
+  "device-connected": { label: "nanoKONTROL2 connected",                type: "ok",      pulse: false },
+  "no-device":        { label: "nanoKONTROL2 not found",                type: "error",   pulse: true  },
+  "no-webmidi":       { label: "WebMIDI not supported in this browser", type: "error",   pulse: false },
+  "connection-lost":  { label: "nanoKONTROL2 connection lost",          type: "warning", pulse: false  },
+}
+
+let midiStatus = "no-device"; // updated by deviceConnected / deviceDisconnected
+let everConnected = false;
+let statusEl = null;
+
 let paletteIndex = 0;  // which palette is active
 let paletteOffset = 0; // shifts which color each character gets
 
@@ -45,16 +56,31 @@ function setup() {
   createCanvas(windowWidth, windowHeight);
 
   midi = new NanoKontrol2({ onReady() { midi.setLed(PLAY, true); }});
+  if (typeof WebMidi === 'undefined') midiStatus = "no-webmidi";
 
   // midi.setSmooth({ enabled: true, easingType: 'easeOut', duration: 400 });
+
+  statusEl = select('#status-banner');
+  applyStatus(midiStatus);
 }
 
 function draw() {
-  background(200, 65, 0);
+  background("#7dde65");
 
   const slotWidth = width / CHANNELS;
   for (let i = 0; i < CHANNELS; i++) {
     drawCharacter(i, slotWidth);
+  }
+
+}
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+}
+
+function keyPressed() {
+  if (key === 'f' || key === 'F') {
+    fullscreen(!fullscreen());
   }
 }
 
@@ -247,6 +273,7 @@ function buttonPressed() {
   }
 }
 
+
 function buttonReleased() {
   setHeld(false);
 }
@@ -259,12 +286,28 @@ function setHeld(on) {
   }
 }
 
-function windowResized() {
-  resizeCanvas(windowWidth, windowHeight);
+
+function deviceConnected() {
+  midiStatus = "ok";
+  everConnected = true;
+  applyStatus("device-connected");
+  setTimeout(() => {
+    statusEl.addClass('fade-out');
+    statusEl.elt.addEventListener('animationend', () => statusEl.addClass('hidden'), { once: true });
+  }, 1500);
 }
 
-function keyPressed() {
-  if (key === 'f' || key === 'F') {
-    fullscreen(!fullscreen());
-  }
+function deviceDisconnected() {
+  const key = everConnected ? "connection-lost" : "no-device";
+  midiStatus = "no-device";
+  applyStatus(key);
+}
+
+function applyStatus(key) {
+  const s = status[key];
+  select('#status-label').html(s.label);
+  statusEl.removeClass('hidden').removeClass('fade-out');
+  for (const t of ['ok', 'warning', 'error']) statusEl.removeClass(t);
+  statusEl.addClass(s.type);
+  if (s.pulse) statusEl.addClass('pulse'); else statusEl.removeClass('pulse');
 }

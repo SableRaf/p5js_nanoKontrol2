@@ -6,3 +6,52 @@ html, body {
 canvas {
   display: block;
 }
+
+#status-banner {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px 6px 10px;
+  background: rgba(255, 255, 255, 0.78);
+  border-radius: 6px;
+  font-family: sans-serif;
+  font-size: 13px;
+  color: #2e2c2d;
+  pointer-events: none;
+}
+
+#status-banner.hidden {
+  display: none;
+}
+
+#status-banner.fade-out {
+  animation: status-fade-out 0.6s ease forwards;
+}
+
+@keyframes status-fade-out {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+#status-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+#status-banner.ok      #status-dot { background: #22c55e; }
+#status-banner.warning #status-dot { background: #f59e0b; }
+#status-banner.error   #status-dot { background: #dc2828; }
+
+#status-banner.pulse #status-dot {
+  animation: status-pulse 1s ease-in-out infinite alternate;
+}
+
+@keyframes status-pulse {
+  from { opacity: 0.4; }
+  to   { opacity: 1; }
+}
