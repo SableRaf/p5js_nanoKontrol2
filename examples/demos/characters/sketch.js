@@ -1,14 +1,20 @@
-// A row of eight characters, one per nanoKONTROL2 channel.
+// Demo sketch for the p5.nanokontrol2 addon library
+// See: https://github.com/SableRaf/p5js_nanoKontrol2
+
+// Each of the 8 channels has a character that bounces up and down, 
+// and respond to the controls on the nanoKONTROL2. 
+// 
+// Try these:
 //
-//   SLIDER_n    -> how high the character floats (0 = low, 1 = high)
-//   KNOB_n      -> the character's hue shift (on top of palette color)
-//   SOLO_n      -> blink (eyes shut while held)
-//   MUTE_n      -> open mouth (while held)
-//   REC_n       -> toggle this character's sleep state (press to flip)
-//   PLAY        -> everyone wakes up and bounces (default)
-//   STOP        -> everyone eases down to a low rest position and falls asleep
-//   PREV/NEXT_MARKER -> cycle palette color offset (shift which color each character gets)
-//   PREV/NEXT_TRACK  -> cycle which palette is active
+//   SLIDER_n    -> slide to change the height of the character
+//   KNOB_n      -> turn to shift the character's color hue
+//   SOLO_n      -> hold to close the character's eyes
+//   MUTE_n      -> hold to open mouth extra wide
+//   REC_n       -> put the character to sleep
+//   PLAY        -> everyone wakes up
+//   STOP        -> everyone falls asleep
+//   PREV/NEXT_MARKER -> shift character colors left/right
+//   PREV/NEXT_TRACK  -> pick previous/next palette
 
 const CHANNELS = 8;
 
