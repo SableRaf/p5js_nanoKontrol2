@@ -232,6 +232,10 @@ export class MidiController {
       console.error('p5.nanokontrol2: WebMidi.js not loaded — check the <script> tag');
       return;
     }
+    if (typeof navigator.requestMIDIAccess !== 'function') {
+      console.warn('p5.nanokontrol2: WebMIDI is not supported in this browser');
+      return;
+    }
     WebMidi.enable()
       .then(() => this._onEnabled())
       .catch((err: Error) => console.error('p5.nanokontrol2: WebMidi:', err.message));
