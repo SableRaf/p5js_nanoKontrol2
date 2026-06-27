@@ -1,6 +1,8 @@
 # p5.nanokontrol2
 
-A [p5.js](https://p5js.org/) addon library for the [Korg nanoKONTROL2](https://www.korg.com/us/products/computergear/nanokontrol2/) MIDI controller, built on [WebMidi.js v3](https://webmidijs.org/).
+A p5.js addon library for the Korg nanoKONTROL2 MIDI controller.
+
+Demo sketch: https://openprocessing.org/@SableRaph/2973319
 
 ![Demo screenshot](https://raw.githubusercontent.com/SableRaf/p5js_nanoKontrol2/main/demo.png)
 
@@ -57,7 +59,7 @@ npm run watch       # rebuild on change
 
 ### Why does it only work with the nanoKONTROL2?
 
-I have a nanoKONTROL2 and I wanted to use it in my p5.js sketches :)
+I have a [Korg nanoKONTROL2](https://www.korg.com/us/products/computergear/nanokontrol2/) and I wanted to use it in my p5.js sketches :)
 
 This is also a choice to keep the project scope small.
 
@@ -68,6 +70,11 @@ If you want to use a different MIDI controller with p5.js, you can use [WebMidi.
 
 Large parts of this project's code and documentation were written or edited with the help of LLM-based tools including Claude Code and GitHub Copilot. A real human (me, [@SableRaf](https://github.com/SableRaf)) has tested the code and verified that everything works as described.
 
+## Acknowledgements
+
+- [WebMidi.js](https://webmidijs.org/) is the underlying library that handles MIDI input/output
+- [p5.js](https://p5js.org/)
+- [OpenProcessing](https://openprocessing.org/)
 
 ## License
 
