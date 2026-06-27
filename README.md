@@ -42,6 +42,14 @@ function buttonPressed() {
 
 More examples are available in the `examples` folder.
 
+## Configuring the nanoKONTROL2
+
+The nanoKONTROL2 has two different operation modes. A "DAW mode" and a "CC mode". **This library is designed to work exclusively with the nanoKONTROL2 in CC Mode.**
+
+Here is how to switch the nanoKONTROL2 to CC mode as described in the [Owner's Manual](https://www.korg.com/us/support/download/manual/0/159/1912/):
+
+> While pressing and holding down the SET MARKER and CYCLE buttons, connect the USB cable from your computer to the nanoKONTROL2 and engage CC mode.
+
 ## Documentation
 
 For the full API docs, see [API.md](API.md).
