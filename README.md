@@ -8,7 +8,7 @@ More about the nanoKONTROL2 on the [Korg website](https://www.korg.com/us/produc
 
 ## Demo
 
-If you already have a nanoKONTROL2, you can try the demo sketch on OpenProcessing:
+Try the demo sketch on OpenProcessing:
 
 https://openprocessing.org/@SableRaph/2973319
 
@@ -52,11 +52,23 @@ More examples are available in the `examples` folder.
 
 ## Configuring the nanoKONTROL2
 
+### Operation mode
+
 The nanoKONTROL2 has two different operation modes. A "DAW mode" and a "CC mode". **This library is designed to work exclusively with the nanoKONTROL2 in CC Mode.**
 
 Here is how to switch the nanoKONTROL2 to CC mode as described in the [Owner's Manual](https://www.korg.com/us/support/download/manual/0/159/1912/):
 
 > While pressing and holding down the SET MARKER and CYCLE buttons, connect the USB cable from your computer to the nanoKONTROL2 and engage CC mode.
+
+### LED control mode
+
+External LED control only works when the nanoKONTROL2's **LED Mode is set to "External"**: download and open the [KORG KONTROL Editor](https://www.korg.com/us/support/download/software/1/133/1355/), go to the Control tab, select "Common", and set LED Mode to "External".
+
+### MIDI configuration
+
+The library also assumes that the nanoKONTROL2 is set to its default MIDI configuration. If you have changed the cc numbers, channels, range, or any other settings, the library may not work as expected. You can reset the nanoKONTROL2 to its default settings by following the instructions in the [Owner's Manual](https://www.korg.com/us/support/download/manual/0/159/1912/).
+
+For more information about the possible configurations of the nanoKONTROL2, see its [MIDI Implementation Chart](https://cdn.korg.com/us/support/download/files/aeb2862daf0cb7db826d8c62f51ec28d.txt).
 
 ## Documentation
 
