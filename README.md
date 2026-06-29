@@ -11,7 +11,7 @@ More about the nanoKONTROL2 on the [Korg website](https://www.korg.com/us/produc
 
 ## Try it
 
-Demo: https://openprocessing.org/@SableRaph/2973319
+[Demo sketch](https://openprocessing.org/@SableRaph/2973319)
 
 ![Demo screenshot](https://raw.githubusercontent.com/SableRaf/p5js_nanoKontrol2/main/demo.png)
 
