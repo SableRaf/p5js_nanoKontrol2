@@ -1,7 +1,7 @@
-# p5.nanokontrol2
-
-> [!IMPORTANT]
+> [!WARNING]
 > This library is in **early development**. The API may change in the future, and some features may not work as expected. Please report any issues on [GitHub](https://github.com/SableRaf/p5js_nanoKontrol2/issues).
+
+# p5.nanokontrol2
 
 A p5.js addon library for the Korg nanoKONTROL2 MIDI controller.
 
