@@ -160,12 +160,17 @@ export class MidiController {
   // Set the latched state of a 'toggle' or 'radio' button, as if it had been
   // pressed to that state. Useful for seeding an initial selection, e.g. lighting
   // PLAY at startup in a PLAY/STOP radio group.
-  //   setToggled(MUTE_1, true)   // latch a toggle on
-  //   setToggled(PLAY, true)     // make PLAY the active radio member
+  //   setToggled(MUTE_1, true)            // latch a toggle on
+  //   setToggled(PLAY, true)              // make PLAY the active radio member
+  //   setToggled([MUTE_1, MUTE_2], true)  // latch several at once
   // For a 'radio' button, setting it true activates it and deactivates its peers;
   // setting it false clears the whole group. Momentary buttons and continuous
   // controls are ignored with a warning.
-  setToggled(name: string, on: boolean): void {
+  setToggled(name: string | string[], on: boolean): void {
+    for (const n of ([] as string[]).concat(name)) this._setToggled(n, on);
+  }
+
+  private _setToggled(name: string, on: boolean): void {
     const type = this._buttonType[name];
     if (type !== 'toggle' && type !== 'radio') {
       console.warn(`setToggled: '${name}' is not a 'toggle' or 'radio' button; ignoring`);

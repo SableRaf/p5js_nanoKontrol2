@@ -224,9 +224,12 @@ Calling [`setLed`](#setledname-on) on a button takes over its LED manually and s
 
 Set the latched state of a `'toggle'` or `'radio'` button, as if it had been pressed to that state. The button's LED updates to match (unless you have taken it over with [`setLed`](#setledname-on)). Use this to seed an initial selection — for example, lighting `PLAY` at startup in a `PLAY`/`STOP` radio group, since a radio group otherwise has no active member until the first press.
 
+`name` accepts a single button or an array of buttons.
+
 ```js
-nano.setToggled(MUTE_1, true);  // latch a toggle on
-nano.setToggled(PLAY, true);    // make PLAY the active radio member
+nano.setToggled(MUTE_1, true);           // latch a toggle on
+nano.setToggled(PLAY, true);             // make PLAY the active radio member
+nano.setToggled([MUTE_1, MUTE_2], true); // latch several at once
 ```
 
 For a `'radio'` button, passing `true` activates it and deactivates its peers; passing `false` clears the whole group. The state is reflected by [`isToggled`](#istoggledname).
