@@ -23,9 +23,29 @@ Import webMidi.js and p5.nanokontrol2 in your HTML:
 <script src="https://cdn.jsdelivr.net/npm/p5.nanokontrol2@0.1.1/dist/p5.nanokontrol2.js"></script>
 ```
 
-Then, in your sketch, create a `NanoKontrol2` instance in `setup()`, then define callback functions to respond to controls.
+Then, in `setup()`, create a `NanoKontrol2` instance:
 
-Here is a minimal code example:
+```js
+midi = new NanoKontrol2() 
+```
+
+Use the callback functions to respond to inputs:
+
+```js
+function buttonPressed() {
+  if (midi.input === PLAY) {
+    console.log("Playing");
+  }
+}
+```
+
+Or access input value directly with `getValue()`:
+
+```js
+midi.getValue(SLIDER_1)
+```
+
+### Minimal example
 
 ```js
 let midi;
