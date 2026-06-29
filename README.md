@@ -6,28 +6,44 @@ A p5.js addon library for the Korg nanoKONTROL2 MIDI controller.
 
 More about the nanoKONTROL2 on the [Korg website](https://www.korg.com/us/products/computergear/nanokontrol2/).
 
-## Demo
+## Try it
 
-Try the demo sketch on OpenProcessing:
-
-https://openprocessing.org/@SableRaph/2973319
+Demo: https://openprocessing.org/@SableRaph/2973319
 
 ![Demo screenshot](https://raw.githubusercontent.com/SableRaf/p5js_nanoKontrol2/main/demo.png)
 
 ## Quick start
 
-Add the scripts to your HTML after p5.js and WebMidi.js:
+Import webMidi.js and p5.nanokontrol2 in your HTML:
 
 ```html
 <script src="https://cdn.jsdelivr.net/npm/webmidi@3/dist/iife/webmidi.iife.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/p5@2.3.0/lib/p5.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/p5.nanokontrol2@0.1.1/dist/p5.nanokontrol2.js"></script>
-<script src="sketch.js"></script>
 ```
 
-Create a `NanoKontrol2` instance in `setup()`, then define callback functions to respond to controls.
+Then, in `setup()`, create a `NanoKontrol2` instance:
 
-Here is a minimal code example:
+```js
+midi = new NanoKontrol2() 
+```
+
+Use the callback functions to respond to inputs:
+
+```js
+function buttonPressed() {
+  if (midi.input === PLAY) {
+    console.log("Playing");
+  }
+}
+```
+
+Or access input value directly with `getValue()`:
+
+```js
+midi.getValue(SLIDER_1)
+```
+
+### Minimal example
 
 ```js
 let midi;
