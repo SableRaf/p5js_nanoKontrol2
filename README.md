@@ -31,7 +31,7 @@ Use the callback functions to respond to inputs:
 
 ```js
 function buttonPressed() {
-  if (midi.input === PLAY) {
+  if (midi.input.name === PLAY) {
     console.log("Playing");
   }
 }
@@ -55,10 +55,10 @@ function setup() {
 }
 
 function buttonPressed() {
-  if (midi.input === PLAY) {
+  if (midi.input.name === PLAY) {
     background("lime");
   }
-  if (midi.input === STOP) {
+  if (midi.input.name === STOP) {
     background("red");
   }
 }
