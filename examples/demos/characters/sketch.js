@@ -49,7 +49,7 @@ function setup() {
   createCanvas(windowWidth, windowHeight);
 
   midi = new NanoKontrol2({
-    statusLabel: true, // built-in on-screen connection status banner
+    statusLabel: true,
     onReady() { midi.setLed(PLAY, true); },
   });
 
