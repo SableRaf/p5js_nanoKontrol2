@@ -68,25 +68,15 @@ More examples are available in the `examples` folder.
 
 ## Configuring the nanoKONTROL2
 
-### Operation mode
+For the library to work, the nanoKONTROL2 needs to be in **CC mode** with **External LED control**, and using its **default MIDI configuration**. To set this up:
 
-The nanoKONTROL2 has two different operation modes. A "DAW mode" and a "CC mode". **This library is designed to work exclusively with the nanoKONTROL2 in CC Mode.**
+1. **Restore factory settings** (only needed if you've previously changed settings with the KORG KONTROL Editor). Hold down the PREV TRACK, NEXT TRACK, and CYCLE buttons while connecting the USB cable. The transport buttons, except CYCLE, will blink.
 
-Here is how to switch the nanoKONTROL2 to CC mode as described in the [Owner's Manual](https://www.korg.com/us/support/download/manual/0/159/1912/):
+2. **Enable CC mode.** Hold down the SET MARKER and CYCLE buttons while connecting the USB cable. (The library does not work in the default "DAW mode".)
 
-> While pressing and holding down the SET MARKER and CYCLE buttons, connect the USB cable from your computer to the nanoKONTROL2 and engage CC mode.
+3. **Set LED Mode to "External".** Open the [KORG KONTROL Editor](https://www.korg.com/us/support/download/software/1/133/1355/), go to the Control tab, select "Common", and set LED Mode to "External". This is required for external LED control to work.
 
-### LED control mode
-
-External LED control only works when the nanoKONTROL2's **LED Mode is set to "External"**: download and open the [KORG KONTROL Editor](https://www.korg.com/us/support/download/software/1/133/1355/), go to the Control tab, select "Common", and set LED Mode to "External".
-
-### MIDI configuration
-
-The library also assumes that the nanoKONTROL2 is set to its default MIDI configuration. If you have previously changed the built-in settings using the Korg KONTROL Editor, the library may not work as expected.
-
-To restore the factory settings, press and hold the PREV TRACK button, NEXT TRACK button, and CYCLE button simultaneously while connecting the USB cable to the nanoKONTROL2. The transport buttons except the CYCLE button will then blink.
-
-For more information, see the Korg nanoKONTROL2 [Parameter Guide](https://cdn.korg.com/us/support/download/files/c8d0cd6808e12d3672845cadcdbbfe9b.pdf).
+For more details, see the Korg nanoKONTROL2 [Owner's Manual](https://www.korg.com/us/support/download/manual/0/159/1912/) and [Parameter Guide](https://cdn.korg.com/us/support/download/files/c8d0cd6808e12d3672845cadcdbbfe9b.pdf).
 
 ## Documentation
 
