@@ -82,9 +82,13 @@ External LED control only works when the nanoKONTROL2's **LED Mode is set to "Ex
 
 ### MIDI configuration
 
-The library also assumes that the nanoKONTROL2 is set to its default MIDI configuration. If you have changed the cc numbers, channels, range, or any other settings, the library may not work as expected. You can reset the nanoKONTROL2 to its default settings by following the instructions in the [Owner's Manual](https://www.korg.com/us/support/download/manual/0/159/1912/).
+The library also assumes that the nanoKONTROL2 is set to its default MIDI configuration.
 
-For more information about the possible configurations of the nanoKONTROL2, see its [MIDI Implementation Chart](https://cdn.korg.com/us/support/download/files/aeb2862daf0cb7db826d8c62f51ec28d.txt).
+If you have changed the cc numbers, channels, range, or any other settings, the library may not work as expected.
+
+To restore the factory settings, press and hold the PREV TRACK button, NEXT TRACK button, and CYCLE button simultaneously while connecting the USB cable to the nanoKONTROL2. The transport buttons except the CYCLE button will then blink.
+
+For more information, see the Korg nanoKONTROL2 [Parameter Guide](https://cdn.korg.com/us/support/download/files/c8d0cd6808e12d3672845cadcdbbfe9b.pdf).
 
 ## Documentation
 
