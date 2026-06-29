@@ -18,8 +18,7 @@
 
 const CHANNELS = 8;
 
-let midi;
-let playing = true;
+let nano;
 
 // Adapted from https://ronikaufman.github.io/color_pals/
 const palettes = [
@@ -38,7 +37,6 @@ let paletteOffset = 0; // shifts which color each character gets
 // Per-channel held-button state, tracked from buttonPressed/buttonReleased.
 const solo = new Array(CHANNELS).fill(false);
 const mute = new Array(CHANNELS).fill(false);
-const awake = new Array(CHANNELS).fill(true); // toggled by REC_n
 const hueShift = new Array(CHANNELS).fill(0); // degrees, from the knob
 
 // Eased per-channel state so transitions are smooth.
@@ -48,12 +46,19 @@ const charY = new Array(CHANNELS).fill(null); // current eased vertical position
 function setup() {
   createCanvas(windowWidth, windowHeight);
 
-  midi = new NanoKontrol2({
+  nano = new NanoKontrol2({
     statusLabel: true,
-    onReady() { midi.setLed(PLAY, true); },
   });
 
-  // midi.setSmooth({ enabled: true, easingType: 'easeOut', duration: 400 });
+  // PLAY/STOP are a radio group: exactly one is active, and its LED lights
+  // automatically. Seed PLAY as the active member so it lights at startup.
+  nano.setType([PLAY, STOP], 'radio');
+  nano.setToggled(PLAY, true);
+
+  // REC_n latches a creature asleep; the LED lights to match its toggled state.
+  for (let i = 0; i < CHANNELS; i++) nano.setType(`REC_${i + 1}`, 'toggle');
+
+  // nano.smoothMode('easeOut', 400);
 }
 
 function draw() {
@@ -80,10 +85,10 @@ function drawCharacter(i, slotWidth) {
   const cx = slotWidth * (i + 0.5);
 
   // Slider sets the resting height: 1 -> high, 0 -> low.
-  const slider = midi.getValue(`SLIDER_${i + 1}`, { defaultValue: 0.5 });
+  const slider = nano.getValue(`SLIDER_${i + 1}`, { defaultValue: 0.5 });
 
   // Asleep when globally stopped or this creature was toggled asleep via REC.
-  const sleeping = !playing || !awake[i];
+  const sleeping = !nano.isToggled(PLAY) || nano.isToggled(`REC_${i + 1}`);
 
   // Target position: follow the slider while awake, sink low when asleep.
   const targetY = sleeping
@@ -221,58 +226,43 @@ function rotateHue(r, g, b, deg) {
   return [(rp + m) * 255, (gp + m) * 255, (bp + m) * 255];
 }
 
-function inputChanged() {
+function controlChanged(control) {
   for (let i = 0; i < CHANNELS; i++) {
-    if (midi.input.name === `KNOB_${i + 1}`) {
-      hueShift[i] = midi.value * 360;
+    if (control === `KNOB_${i + 1}`) {
+      hueShift[i] = nano.value * 360;
     }
   }
 }
 
-function buttonPressed() {
-  setHeld(true);
+function buttonPressed(btn) {
+  setHeld(btn, true);
 
-  const inputName = midi.input.name;
+  // REC_n sleep state and its LED are handled automatically by setType('toggle');
+  // isToggled(REC_n) reports whether a creature is asleep (see draw()).
 
-  // REC_n toggles a single creature's sleep state.
-  for (let i = 0; i < CHANNELS; i++) {
-    if (inputName === `REC_${i + 1}`) {
-      awake[i] = !awake[i];
-      midi.setLed(`REC_${i + 1}`, !awake[i]); // lit while asleep
-    }
-  }
+  // PLAY/STOP are a radio group, so their state and LEDs are managed
+  // automatically; draw() reads nano.isToggled(PLAY) directly.
 
-  if (inputName === PLAY) {
-    playing = true;
-    midi.setLed(PLAY, true);
-    midi.setLed(STOP, false);
-  }
-  if (inputName === STOP) {
-    playing = false;
-    midi.setLed(PLAY, false);
-    midi.setLed(STOP, true);
-  }
-
-  if (inputName === NEXT_MARKER) paletteOffset = ((paletteOffset - 1) % palettes[paletteIndex].length + palettes[paletteIndex].length) % palettes[paletteIndex].length;
-  if (inputName === PREV_MARKER) paletteOffset = (paletteOffset + 1) % palettes[paletteIndex].length;
-  if (inputName === PREV_TRACK) {
+  if (btn === NEXT_MARKER) paletteOffset = ((paletteOffset - 1) % palettes[paletteIndex].length + palettes[paletteIndex].length) % palettes[paletteIndex].length;
+  if (btn === PREV_MARKER) paletteOffset = (paletteOffset + 1) % palettes[paletteIndex].length;
+  if (btn === PREV_TRACK) {
     paletteIndex = ((paletteIndex - 1) % palettes.length + palettes.length) % palettes.length;
     paletteOffset = 0;
   }
-  if (inputName === NEXT_TRACK) {
+  if (btn === NEXT_TRACK) {
     paletteIndex = (paletteIndex + 1) % palettes.length;
     paletteOffset = 0;
   }
 }
 
-function buttonReleased() {
-  setHeld(false);
+function buttonReleased(btn) {
+  setHeld(btn, false);
 }
 
 // Update the per-channel held state for SOLO/MUTE (hold-only) and mirror on LEDs.
-function setHeld(on) {
+function setHeld(btn, on) {
   for (let i = 0; i < CHANNELS; i++) {
-    if (midi.input.name === `SOLO_${i + 1}`) { solo[i] = on; midi.setLed(`SOLO_${i + 1}`, on); }
-    if (midi.input.name === `MUTE_${i + 1}`) { mute[i] = on; midi.setLed(`MUTE_${i + 1}`, on); }
+    if (btn === `SOLO_${i + 1}`) { solo[i] = on; nano.setLed(`SOLO_${i + 1}`, on); }
+    if (btn === `MUTE_${i + 1}`) { mute[i] = on; nano.setLed(`MUTE_${i + 1}`, on); }
   }
 }

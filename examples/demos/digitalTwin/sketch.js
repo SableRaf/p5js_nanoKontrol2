@@ -5,11 +5,13 @@
 // that the LED mode is set to "external" (so the LEDs 
 // are controlled by the software, not the hardware).
 
-let midi;
+let nano;
 let ui;
 
-// Toggle state keyed by control name (e.g. 'SOLO_1').
-const TOGGLE_STATES = {};
+// The latching button groups, defined once and reused for setup + UI sync.
+const SOLO = ['SOLO_1','SOLO_2','SOLO_3','SOLO_4','SOLO_5','SOLO_6','SOLO_7','SOLO_8'];
+const MUTE = ['MUTE_1','MUTE_2','MUTE_3','MUTE_4','MUTE_5','MUTE_6','MUTE_7','MUTE_8'];
+const REC  = ['REC_1','REC_2','REC_3','REC_4','REC_5','REC_6','REC_7','REC_8'];
 
 async function setup() {
   noCanvas();
@@ -18,17 +20,20 @@ async function setup() {
   await ui.load();
   ui.resetKnobs();
 
-  midi = new NanoKontrol2({ debugLogs: true, statusLabel: true });
+  nano = new NanoKontrol2({ debugLogs: true, statusLabel: true });
+
+  // Let the library manage latched state and hardware LEDs.
+  // SOLO is a mutually-exclusive radio group; MUTE and REC latch independently.
+  nano.setType(SOLO, 'radio');
+  nano.setType(MUTE, 'toggle');
+  nano.setType(REC, 'toggle');
 }
 
-function syncLedToggledStates() {
-  for (const [name, on] of Object.entries(TOGGLE_STATES)) {
-    midi.setLed(name, on);
+// Mirror every latching button's library-managed state onto the digital twin.
+function syncLatchingUi() {
+  for (const name of [...SOLO, ...MUTE, ...REC]) {
+    ui.setChannelButtonByName(name, nano.isToggled(name));
   }
-}
-
-function resetToggleStates() {
-  for (const name of Object.keys(TOGGLE_STATES)) TOGGLE_STATES[name] = false;
 }
 
 // ── MIDI callbacks ────────────────────────────────────────────────────────────
@@ -40,33 +45,25 @@ function deviceConnected() {
 function deviceDisconnected() {
   ui.setPowerIndicator(false);
   ui.setAllLeds(false);
-  resetToggleStates(); // clear toggle states so the next device connection starts fresh
 }
 
-function buttonPressed() {
-  const { name, type, hasLed } = midi.input;
-
-  if (type === 'toggle') {
-    TOGGLE_STATES[name] = !TOGGLE_STATES[name]; // toggle state keyed by control name (e.g. 'SOLO_1')
-    midi.setLed(name, TOGGLE_STATES[name]); // mirror on hardware LED
-    ui.setChannelButtonByName(name, TOGGLE_STATES[name]); // mirror on digital twin
+function buttonPressed(btn) {
+  // For latching buttons (toggle/radio) the library tracks state and drives the
+  // hardware LED; we just mirror the resulting state onto the digital twin.
+  if (nano.getType(btn) === 'momentary') {
+    ui.pressButton(btn);
   } else {
-    if (hasLed) midi.setLed(name, true); // mirror on hardware LED
-    ui.pressButton(name);
+    syncLatchingUi(); // radio may have flipped a peer, so refresh the whole group
   }
 }
 
-function buttonReleased() {
-  const { name, type, hasLed } = midi.input;
-  if (type === 'toggle') return; // ignore release events for toggle buttons
-  if (hasLed) midi.setLed(name, false);
-  ui.releaseButton(name);
+function buttonReleased(btn) {
+  if (nano.getType(btn) === 'momentary') ui.releaseButton(btn);
 }
 
-function inputChanged() {
-  const { name } = midi.input;
+function controlChanged(control) {
   for (let i = 1; i <= 8; i++) {
-    if (name === `KNOB_${i}`)   { ui.setKnob(i, midi.getValue(`KNOB_${i}`));   return; }
-    if (name === `SLIDER_${i}`) { ui.setFader(i, midi.getValue(`SLIDER_${i}`)); return; }
+    if (control === `KNOB_${i}`)   { ui.setKnob(i, nano.getValue(`KNOB_${i}`));   return; }
+    if (control === `SLIDER_${i}`) { ui.setFader(i, nano.getValue(`SLIDER_${i}`)); return; }
   }
 }

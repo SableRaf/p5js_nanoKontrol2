@@ -1,11 +1,11 @@
 // Toggle the LEDs on the nanoKONTROL2 by pressing the buttons
 
-let midi;
+let nano;
 
 function setup() {
   createCanvas(600, 600);
   background(176);
-  midi = new NanoKontrol2();
+  nano = new NanoKontrol2();
 
   drawCaption(`
     Press any button on the nanoKONTROL2 to light it up \n
@@ -14,19 +14,17 @@ function setup() {
   `);
 }
 
-function buttonPressed() {
-  const { name: inputName, hasLed } = midi.input;
-  
+function buttonPressed(btn) {
   // Turn off all LEDs when the SET button is pressed
-  if( inputName === SET_MARKER){
-    midi.setAllLeds(false);
+  if (btn === SET_MARKER) {
+    nano.setAllLeds(false);
   }
-  
-  // If the button doesn't have an LED, we don't need to do anything else
-  if (!hasLed) return;
 
-  // Toggle the LED state for the button that was pressed
-  midi.setLed(inputName, true);
+  // If the button doesn't have an LED, we don't need to do anything else
+  if (!nano.hasLed(btn)) return;
+
+  // Light up the button that was pressed
+  nano.setLed(btn, true);
 }
 
 function drawCaption(s){

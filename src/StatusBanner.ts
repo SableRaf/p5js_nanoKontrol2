@@ -126,6 +126,20 @@ export class StatusBanner {
     this._apply(this._everConnected ? 'connection-lost' : 'no-device');
   }
 
+  /** Hide the banner immediately (runtime statusLabel(false)). */
+  hide(): void {
+    if (this._hideTimer) {
+      clearTimeout(this._hideTimer);
+      this._hideTimer = null;
+    }
+    this._el?.classList.add('hidden');
+  }
+
+  /** Re-show a previously hidden banner. */
+  show(): void {
+    this._el?.classList.remove('hidden', 'fade-out');
+  }
+
   private _apply(key: StatusKey): void {
     if (this._hideTimer) {
       clearTimeout(this._hideTimer);

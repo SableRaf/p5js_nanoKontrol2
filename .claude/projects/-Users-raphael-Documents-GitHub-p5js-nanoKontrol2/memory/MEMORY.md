@@ -1,0 +1,1 @@
+- [LED manual-ownership invariant](led-manual-ownership-invariant.md) — internal/bulk LED writes must use _sendLed, not setLed, or auto-LED dies

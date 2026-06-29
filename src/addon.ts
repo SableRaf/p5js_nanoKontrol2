@@ -1,6 +1,6 @@
 // p5 addon registration.
 
-import { RAW } from './constants';
+import { NORMALIZED, RAW } from './constants';
 import { MidiController } from './MidiController';
 import { NANOKONTROL2_DEF } from './devices/nanokontrol2.device';
 import type { MidiControllerOptions } from './types';
@@ -10,6 +10,7 @@ export function nanoKontrol2Addon(p5: any, fn: any, lifecycles: any): void {
   // derived from the device definition (the source of truth); RAW and other
   // generic constants are added alongside them.
   fn.RAW = RAW;
+  fn.NORMALIZED = NORMALIZED;
   for (const ctrl of NANOKONTROL2_DEF.controls) {
     fn[ctrl.constant] = ctrl.constant;
   }

@@ -21,20 +21,21 @@ Import webMidi.js and p5.nanokontrol2 in your HTML:
 
 ```html
 <script src="https://cdn.jsdelivr.net/npm/webmidi@3/dist/iife/webmidi.iife.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/p5.nanokontrol2@0.1.2/dist/p5.nanokontrol2.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/p5.nanokontrol2@0.2.0/dist/p5.nanokontrol2.js"></script>
 ```
 
 Then, in `setup()`, create a `NanoKontrol2` instance:
 
 ```js
-midi = new NanoKontrol2() 
+nano = new NanoKontrol2() 
 ```
 
-Use the callback functions to respond to inputs:
+Use the callback functions to respond to inputs. The triggering control's name is
+passed as the first argument, so you can compare it directly:
 
 ```js
-function buttonPressed() {
-  if (midi.input.name === PLAY) {
+function buttonPressed(btn) {
+  if (btn === PLAY) {
     console.log("Playing");
   }
 }
@@ -43,25 +44,30 @@ function buttonPressed() {
 Or access input value directly with `getValue()`:
 
 ```js
-midi.getValue(SLIDER_1)
+nano.getValue(SLIDER_1)
 ```
+
+> [!NOTE]
+> All buttons default to **momentary**: they fire `buttonPressed`/`buttonReleased`
+> while held. Make a button latching (`'toggle'`) or mutually exclusive (`'radio'`)
+> with [`setType`](API.md#settypename-type).
 
 ### Minimal example
 
 ```js
-let midi;
+let nano;
 
 function setup() {
   createCanvas(600, 600);
-  midi = new NanoKontrol2();
+  nano = new NanoKontrol2();
   background(176);
 }
 
-function buttonPressed() {
-  if (midi.input.name === PLAY) {
+function buttonPressed(btn) {
+  if (btn === PLAY) {
     background("lime");
   }
-  if (midi.input.name === STOP) {
+  if (btn === STOP) {
     background("red");
   }
 }

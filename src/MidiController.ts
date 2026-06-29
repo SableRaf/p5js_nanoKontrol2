@@ -4,11 +4,14 @@ import { MIDI_CC_MAX, RAW } from './constants';
 import { EASING, durationToSpeed } from './smoothing';
 import { StatusBanner } from './StatusBanner';
 import type {
+  ButtonType,
   ControllerDefinition,
+  EasingType,
   GetValueOptions,
   InputControl,
   MidiControllerOptions,
-  SetSmoothOptions,
+  Range,
+  RuntimeType,
   SmoothConfig,
 } from './types';
 
@@ -33,6 +36,19 @@ export class MidiController {
   private _defaultValue: number;
   private _smooth: SmoothConfig = { enabled: false, easingType: 'lerp', duration: 150 };
   private _smoothPerName: Record<string, SmoothConfig> = {};
+
+  /** Per-button runtime type (default 'momentary'); sliders/knobs are excluded. */
+  private _buttonType: Record<string, ButtonType> = {};
+  /** Latched state for toggle/radio buttons. */
+  private _toggled: Record<string, boolean> = {};
+  /** Physical held state for buttons. */
+  private _pressed: Record<string, boolean> = {};
+  /** Radio groups, keyed by each member name → the group's member list. */
+  private _radioGroup: Record<string, string[]> = {};
+  /** Buttons whose LED has been taken over by an explicit setLed call. */
+  private _ledManual: Record<string, boolean> = {};
+  /** Per-control custom value ranges (overrides RAW/NORMALIZED). */
+  private _range: Record<string, Range> = {};
 
   /** WebMidi output port for LED control. */
   private _output: any = null;
@@ -68,6 +84,9 @@ export class MidiController {
         this._ccMap[cc] = entry;
       }
       this._nameToCC[ctrl.constant] = ctrl.ctrlIndex[0];
+      // Every non-continuous control is a button; default its runtime type to
+      // 'momentary' (toggle/radio is opt-in via setType).
+      if (ctrl.type !== 'continuous') this._buttonType[ctrl.constant] = 'momentary';
     }
 
     this._defaultValue = Math.min(Math.max(defaultValue, 0), 1) * MIDI_CC_MAX;
@@ -82,29 +101,135 @@ export class MidiController {
     return this._output !== null;
   }
 
-  /** Returns the control metadata for a given name, or undefined if unknown. */
-  getControl(name: string): InputControl | undefined {
-    const cc = this._nameToCC[name];
-    return cc !== undefined ? this._ccMap[cc] : undefined;
+  /** True if the named control is a button (not a continuous slider/knob). */
+  private _isButton(name: string): boolean {
+    return this._buttonType[name] !== undefined;
   }
 
-  // inputMode(RAW)            — set global raw mode
-  // inputMode(KNOB_1, RAW)    — set per-control raw mode
-  inputMode(a: string, b?: string): void {
+  /**
+   * The live runtime type of a control: 'continuous' for sliders/knobs, or the
+   * last setType() value for buttons (default 'momentary'). undefined if unknown.
+   */
+  getType(name: string): RuntimeType | undefined {
+    const cc = this._nameToCC[name];
+    if (cc === undefined) return undefined;
+    return this._buttonType[name] ?? 'continuous';
+  }
+
+  /** Whether the named control has a hardware LED. undefined if unknown. */
+  hasLed(name: string): boolean | undefined {
+    const cc = this._nameToCC[name];
+    return cc !== undefined ? this._ccMap[cc].hasLed : undefined;
+  }
+
+  /** True while the named button is physically held down. */
+  isPressed(name: string): boolean {
+    return this._pressed[name] ?? false;
+  }
+
+  /** Library-managed latched state for a 'toggle'/'radio' button. */
+  isToggled(name: string): boolean {
+    return this._toggled[name] ?? false;
+  }
+
+  // Change a button's runtime behavior.
+  //   setType(MUTE_1, 'toggle')
+  //   setType([MUTE_1, MUTE_2], 'toggle')
+  //   setType([SOLO_1, SOLO_2, ...], 'radio')  // mutually exclusive group
+  // Sliders and knobs are continuous and ignored. 'radio' requires an array of
+  // two or more controls; invalid calls warn and are ignored.
+  setType(name: string | string[], type: ButtonType): void {
+    const names = ([] as string[]).concat(name).filter(n => this._isButton(n));
+
+    if (type === 'radio' && names.length < 2) {
+      console.warn("setType: 'radio' requires an array of 2 or more controls; ignoring");
+      return;
+    }
+
+    for (const n of names) {
+      this._buttonType[n] = type;
+      if (type === 'radio') {
+        this._radioGroup[n] = names;
+      } else {
+        delete this._radioGroup[n];
+      }
+      this._applyAutoLed(n);
+    }
+  }
+
+  // Set the latched state of a 'toggle' or 'radio' button, as if it had been
+  // pressed to that state. Useful for seeding an initial selection, e.g. lighting
+  // PLAY at startup in a PLAY/STOP radio group.
+  //   setToggled(MUTE_1, true)   // latch a toggle on
+  //   setToggled(PLAY, true)     // make PLAY the active radio member
+  // For a 'radio' button, setting it true activates it and deactivates its peers;
+  // setting it false clears the whole group. Momentary buttons and continuous
+  // controls are ignored with a warning.
+  setToggled(name: string, on: boolean): void {
+    const type = this._buttonType[name];
+    if (type !== 'toggle' && type !== 'radio') {
+      console.warn(`setToggled: '${name}' is not a 'toggle' or 'radio' button; ignoring`);
+      return;
+    }
+
+    if (type === 'radio') {
+      for (const member of this._radioGroup[name] ?? [name]) {
+        const wasActive = this._toggled[member] ?? false;
+        const nowActive = on && member === name;
+        if (wasActive === nowActive) continue;
+        this._toggled[member] = nowActive;
+        this._applyAutoLed(member);
+      }
+      return;
+    }
+
+    if ((this._toggled[name] ?? false) === on) return;
+    this._toggled[name] = on;
+    this._applyAutoLed(name);
+  }
+
+  // valueMode(RAW)            — set global raw mode
+  // valueMode(NORMALIZED)     — set global normalized mode (default)
+  // valueMode(KNOB_1, RAW)    — set per-control raw mode
+  // A global call clears all custom ranges; a per-control call clears that
+  // control's custom range.
+  valueMode(a: string, b?: string): void {
     if (b === undefined) {
-      // Single argument: global mode toggle.
+      // Single argument: global mode toggle. Clears all custom ranges.
       this._rawGlobal = a === RAW;
+      this._range = {};
     } else {
       const cc = this._nameToCC[a];
-      if (cc !== undefined) this._rawMode[cc] = b === RAW;
+      if (cc !== undefined) {
+        this._rawMode[cc] = b === RAW;
+        delete this._range[a];
+      }
     }
+  }
+
+  // Map a control's full travel to a custom min..max range. Overrides the
+  // RAW/NORMALIZED mode for that control.
+  setRange(name: string, min: number, max: number): void {
+    if (this._nameToCC[name] === undefined) return;
+    this._range[name] = { min, max };
   }
 
   // Turn a button LED on (true) or off (false) by control name.
   // Note: external LED control only works when the nanoKONTROL2's LED Mode is
   // set to "External" (via the KORG Kontrol Editor). In the default "Internal"
   // mode the unit drives its own LEDs and ignores these messages.
-  setLed(name: string, on: boolean): void {
+  // name accepts a single control or an array. An explicit setLed call takes
+  // over the button's LED, stopping automatic type-driven behavior for it.
+  setLed(name: string | string[], on: boolean): void {
+    for (const n of ([] as string[]).concat(name)) {
+      this._ledManual[n] = true;
+      this._sendLed(n, on);
+    }
+  }
+
+  // Low-level LED write that does not claim manual ownership — used by both
+  // setLed and the automatic type-driven LED behavior.
+  private _sendLed(name: string, on: boolean): void {
     if (!this._output) {
       if (this._debugLogs) console.warn(`[nanokontrol2] setLed(${name}): no MIDI output port found`);
       return;
@@ -114,28 +239,67 @@ export class MidiController {
       if (this._debugLogs) console.warn(`[nanokontrol2] setLed: unknown control "${name}"`);
       return;
     }
+    if (this._debugLogs) console.log(`[nanokontrol2] LED  ${name} (cc${cc}) -> ${on ? 'ON' : 'off'}`);
     this._output.sendControlChange(cc, on ? 127 : 0);
   }
 
+  // Drive a button's LED from its runtime type, unless setLed has taken over.
+  // No-op for non-LED buttons; only visible in External LED mode.
+  private _applyAutoLed(name: string): void {
+    if (this._ledManual[name]) return;
+    const type = this._buttonType[name];
+    if (type === undefined) return; // not a button
+    if (this.hasLed(name) !== true) return;
+
+    let on: boolean;
+    if (type === 'momentary') on = this._pressed[name] ?? false;
+    else on = this._toggled[name] ?? false; // toggle and radio
+    this._sendLed(name, on);
+  }
+
+  // Turn all button LEDs on or off at once. Unlike setLed, this does not claim
+  // manual LED ownership, so type-driven auto-LED resumes on the next press.
   setAllLeds(state: boolean): void {
     for (const name of Object.keys(this._nameToCC)) {
-      this.setLed(name, state);
+      this._sendLed(name, state);
     }
   }
 
-  // Configure smoothing globally, or for specific input(s).
-  //   inputName  — name string or array of names; omit to set globally
-  //   enabled    — true/false (default true)
-  //   easingType — 'lerp' | 'easeIn' | 'easeOut' | 'easeInOut' (default 'lerp')
-  //   duration   — time in ms to reach ~95% of target (default 150)
-  setSmooth({ inputName, enabled = true, easingType = 'lerp', duration = 150 }: SetSmoothOptions = {}): void {
-    const config: SmoothConfig = { enabled, easingType, duration };
-    if (inputName === undefined) {
-      this._smooth = config;
-    } else {
-      for (const name of ([] as string[]).concat(inputName)) {
-        this._smoothPerName[name] = config;
+  // Configure smoothing for one or more controls.
+  //   setSmooth(SLIDER_1, 'easeOut', 500)
+  //   setSmooth([SLIDER_1, SLIDER_2], 'easeIn', 300)
+  //   setSmooth(KNOB_1, false)   — toggle enabled, keeping other settings
+  // duration defaults to 150 ms (~time to reach 95% of target at 60 fps).
+  setSmooth(name: string | string[], easing: EasingType | boolean, duration?: number): void {
+    for (const n of ([] as string[]).concat(name)) {
+      if (typeof easing === 'boolean') {
+        const base = this._smoothPerName[n] ?? this._smooth;
+        this._smoothPerName[n] = { ...base, enabled: easing };
+      } else {
+        this._smoothPerName[n] = { enabled: true, easingType: easing, duration: duration ?? 150 };
       }
+    }
+  }
+
+  // Configure smoothing globally for all controls. Per-control setSmooth wins.
+  //   smoothMode('easeInOut', 200)
+  //   smoothMode(false)   — toggle global enabled, keeping other settings
+  smoothMode(easing: EasingType | boolean, duration?: number): void {
+    if (typeof easing === 'boolean') {
+      this._smooth = { ...this._smooth, enabled: easing };
+    } else {
+      this._smooth = { enabled: true, easingType: easing, duration: duration ?? 150 };
+    }
+  }
+
+  // Show or hide the on-screen connection status banner at runtime.
+  statusLabel(on: boolean): void {
+    if (on) {
+      if (!this._statusBanner) this._statusBanner = new StatusBanner(this._def.model);
+      if (this.isConnected) this._statusBanner.connected();
+      else this._statusBanner.disconnected();
+    } else {
+      this._statusBanner?.hide();
     }
   }
 
@@ -166,6 +330,12 @@ export class MidiController {
       ? (this._smoothed[cc] ?? this._values[cc] ?? fallback)
       : (this._values[cc] ?? fallback);
 
+    const range = this._range[name];
+    if (range) {
+      // A custom range maps normalized 0..1 → min..max, overriding RAW/NORMALIZED.
+      return range.min + (raw / MIDI_CC_MAX) * (range.max - range.min);
+    }
+
     const isRaw = this._rawGlobal || this._rawMode[cc];
     return isRaw ? raw : raw / MIDI_CC_MAX;
   }
@@ -185,24 +355,44 @@ export class MidiController {
 
     if (ctrl.type === 'continuous') {
       // Report the immediate target value to the callback. When smoothing is
-      // enabled, _interpolate() re-fires inputChanged each frame with the
+      // enabled, _interpolate() re-fires controlChanged each frame with the
       // smoothed value until the control settles.
       this.value = this.getValue(ctrl.name, { smoothed: false });
-      this._dispatchAction('inputChanged');
+      this._dispatchAction('controlChanged', ctrl.name);
     } else {
       this.value = this.getValue(ctrl.name, { smoothed: false });
       const prev = this._prevValues[cc] ?? 0;
       if (rawValue > 0 && prev === 0) {
-        this._dispatchAction('buttonPressed');
+        this._pressed[ctrl.name] = true;
+        this._onButtonPress(ctrl.name);
+        this._applyAutoLed(ctrl.name);
+        this._dispatchAction('buttonPressed', ctrl.name);
       } else if (rawValue === 0 && prev > 0) {
-        this._dispatchAction('buttonReleased');
+        this._pressed[ctrl.name] = false;
+        this._applyAutoLed(ctrl.name);
+        this._dispatchAction('buttonReleased', ctrl.name);
+      }
+    }
+  }
+
+  // Update library-managed latched state on a button press, per its type.
+  private _onButtonPress(name: string): void {
+    const type = this._buttonType[name];
+    if (type === 'toggle') {
+      this._toggled[name] = !this._toggled[name];
+    } else if (type === 'radio') {
+      for (const member of this._radioGroup[name] ?? [name]) {
+        const wasActive = this._toggled[member];
+        this._toggled[member] = member === name;
+        // Refresh peers' LEDs when their state changed.
+        if (member !== name && wasActive) this._applyAutoLed(member);
       }
     }
   }
 
   // Advance all smoothed values one step toward their targets.
   // Called automatically each frame via the `predraw` lifecycle hook.
-  // While a continuous control is still settling, re-fires inputChanged so
+  // While a continuous control is still settling, re-fires controlChanged so
   // callback-driven sketch state tracks the smoothed value frame by frame.
   _interpolate(): void {
     for (const [ccKey, ctrl] of Object.entries(this._ccMap)) {
@@ -221,12 +411,12 @@ export class MidiController {
       const t = ease(durationToSpeed(smooth.duration));
       this._smoothed[cc] = current + (target - current) * t;
 
-      // Re-dispatch inputChanged for continuous controls so callbacks that
-      // read midi.value keep tracking the smoothed value.
+      // Re-dispatch controlChanged for continuous controls so callbacks that
+      // read nano.value keep tracking the smoothed value.
       if (ctrl.type === 'continuous') {
         this.input = ctrl;
         this.value = this.getValue(ctrl.name);
-        this._dispatchAction('inputChanged');
+        this._dispatchAction('controlChanged', ctrl.name);
       }
     }
   }
@@ -248,15 +438,18 @@ export class MidiController {
       .catch((err: Error) => console.error('p5.nanokontrol2: WebMidi:', err.message));
   }
 
-  private _dispatchAction(name: 'deviceConnected' | 'deviceDisconnected' | 'inputChanged' | 'buttonPressed' | 'buttonReleased'): void {
+  private _dispatchAction(
+    name: 'deviceConnected' | 'deviceDisconnected' | 'controlChanged' | 'buttonPressed' | 'buttonReleased',
+    controlName?: string,
+  ): void {
     // Keep the optional status banner in sync with the connection lifecycle.
     if (name === 'deviceConnected') this._statusBanner?.connected();
     else if (name === 'deviceDisconnected') this._statusBanner?.disconnected();
 
     // Instance mode: the callback is a method on the sketch. Global mode: p5
     // does not copy user functions onto the instance, so they live on window.
-    if (typeof this._p5?.[name] === 'function') this._p5[name]();
-    else if (typeof (window as any)[name] === 'function') (window as any)[name]();
+    if (typeof this._p5?.[name] === 'function') this._p5[name](controlName);
+    else if (typeof (window as any)[name] === 'function') (window as any)[name](controlName);
   }
 
   private _onEnabled(): void {
@@ -320,21 +513,35 @@ export class MidiController {
       .map(c => c.constant);
     const delay = (ms: number) => new Promise(r => setTimeout(r, ms));
 
-    for (const name of buttonNames) this.setLed(name, false); // start clean
+    // Use _sendLed (not the public setLed) so the connect animation does not
+    // claim manual LED ownership — otherwise auto type-driven LEDs would be
+    // permanently suppressed for every button after startup.
+    for (const name of buttonNames) this._sendLed(name, false); // start clean
 
     for (const name of buttonNames) {
-      this.setLed(name, true);
+      this._sendLed(name, true);
       await delay(30);
-      this.setLed(name, false);
+      this._sendLed(name, false);
     }
 
     await delay(400);
 
     for (let j = 0; j < 2; j++) {
-      for (const name of buttonNames) this.setLed(name, true);
+      for (const name of buttonNames) this._sendLed(name, true);
       await delay(150);
-      for (const name of buttonNames) this.setLed(name, false);
+      for (const name of buttonNames) this._sendLed(name, false);
       await delay(100);
     }
+
+    // The sequence above left every LED off. Restore the latched state that
+    // setType/setToggled may have established before the device connected, so
+    // seeded toggles and radio selections light up once startup finishes.
+    this._refreshAutoLeds();
+  }
+
+  // Re-send each button's type-driven LED from its current latched state.
+  // _applyAutoLed skips buttons whose LED was claimed by an explicit setLed.
+  private _refreshAutoLeds(): void {
+    for (const name of Object.keys(this._buttonType)) this._applyAutoLed(name);
   }
 }

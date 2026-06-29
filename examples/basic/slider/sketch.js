@@ -1,12 +1,12 @@
 // Move the first vertical slider up and down to change the size of the square
 
-let midi;
+let nano;
 
 let size = 300;
 
 function setup() {
   createCanvas(600, 600);
-  midi = new NanoKontrol2();
+  nano = new NanoKontrol2();
   rectMode(CENTER);
   background(175);
 }
@@ -19,9 +19,9 @@ function draw() {
   pop();
 }
 
-function inputChanged() {
-  if (midi.input.name === SLIDER_1) {
-    size = map(midi.getValue(SLIDER_1), 0, 1, 50, min(width, height) * 0.6);
-    console.log('Slider 1 value:', midi.getValue(SLIDER_1));
+function controlChanged(control) {
+  if (control === SLIDER_1) {
+    size = map(nano.getValue(SLIDER_1), 0, 1, 50, min(width, height) * 0.6);
+    console.log('Slider 1 value:', nano.getValue(SLIDER_1));
   }
 }

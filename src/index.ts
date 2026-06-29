@@ -6,11 +6,11 @@
 //   <script src="https://cdn.jsdelivr.net/npm/p5@2.3.0/lib/p5.min.js"></script>
 //   <script src="p5.nanokontrol2.js"></script>
 //
-//   let midi;
-//   function setup() { midi = new NanoKontrol2(); }
-//   function inputChanged() { if (midi.input.name === KNOB_1) hue = midi.value * 360; }
-//   function buttonPressed() { if (midi.input.name === PLAY) playing = true; }
-//   function buttonReleased() { if (midi.input.name === REC_1) recording = false; }
+//   let nano;
+//   function setup() { nano = new NanoKontrol2(); }
+//   function controlChanged(ctrl) { if (ctrl === KNOB_1) hue = nano.getValue(KNOB_1) * 360; }
+//   function buttonPressed(btn) { if (btn === PLAY) playing = true; }
+//   function buttonReleased(btn) { if (btn === REC_1) recording = false; }
 //
 // See README.md for the full public API.
 

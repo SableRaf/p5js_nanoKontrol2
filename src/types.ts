@@ -3,6 +3,12 @@
 export type ControlType = 'continuous' | 'momentary' | 'toggle';
 export type CtrlType = 'cc';
 
+/** Runtime button behavior, set via setType(). */
+export type ButtonType = 'momentary' | 'toggle' | 'radio';
+
+/** Live runtime type reported by getType(). */
+export type RuntimeType = 'continuous' | ButtonType;
+
 export interface Control {
   /** Public constant name, e.g. 'SLIDER_1'. */
   constant: string;
@@ -34,7 +40,7 @@ export interface ControllerDefinition {
   controls: Control[];
 }
 
-/** The object set on midi.input when a control fires. */
+/** The object set on nano.input when a control fires. */
 export interface InputControl {
   /** The control's constant name, e.g. 'KNOB_1'. */
   name: string;
@@ -61,9 +67,10 @@ export interface SmoothConfig {
   duration: number;
 }
 
-export interface SetSmoothOptions extends Partial<SmoothConfig> {
-  /** Name string or array of names; omit to set globally. */
-  inputName?: string | string[];
+/** A custom value range set via setRange(). */
+export interface Range {
+  min: number;
+  max: number;
 }
 
 export interface GetValueOptions {

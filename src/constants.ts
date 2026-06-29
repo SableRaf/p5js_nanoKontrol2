@@ -7,5 +7,6 @@
 
 export const MIDI_CC_MAX = 127;
 
-// Input mode
+// Value mode
 export const RAW = 'RAW';
+export const NORMALIZED = 'NORMALIZED';
