@@ -21,7 +21,7 @@ Import webMidi.js and p5.nanokontrol2 in your HTML:
 
 ```html
 <script src="https://cdn.jsdelivr.net/npm/webmidi@3/dist/iife/webmidi.iife.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/p5.nanokontrol2@0.1.1/dist/p5.nanokontrol2.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/p5.nanokontrol2@0.1.2/dist/p5.nanokontrol2.js"></script>
 ```
 
 Then, in `setup()`, create a `NanoKontrol2` instance:
