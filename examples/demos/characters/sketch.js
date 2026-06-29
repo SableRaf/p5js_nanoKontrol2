@@ -21,25 +21,11 @@ const CHANNELS = 8;
 let nano;
 let characters = [];
 
-// Adapted from https://ronikaufman.github.io/color_pals/
-const palettes = [
-  ["#f398c3", "#f44e24", "#f4d730", "#23b247", "#2a76d3"],
-  ["#fef9c6", "#ffcc4d", "#f5b800", "#56a1c4", "#4464a1", "#ee726b", "#df5f50", "#5a3034"],
-  ["#4464a1", "#62b6de", "#b3dce0", "#ffc5c7", "#ee726b", "#cd1440"],
-  ["#f2eb8a", "#fed000", "#fc8405", "#ed361a", "#4464a1", "#f398c3", "#cf3895", "#6d358a", "#06b4b0", "#4b8a5f"],
-  ["#abcd5e", "#29ac9f", "#14976b", "#b3dce0", "#62b6de", "#2b67af", "#f589a3", "#ef562f", "#fc8405", "#f9d531"],
-  ["#584594", "#e488b7", "#d74c41", "#f0d235", "#36ad63", "#69bcea"],
-  ["#F59FAC", "#F2C800", "#72ADDC", "#BC71BA", "#62B100", "#F5B200", "#CC530A"] // Waxy Corn, Dark Orange
-]
-
-let paletteIndex = 0;  // which palette is active
-let paletteOffset = 0; // shifts which color each character gets
-
 function setup() {
   createCanvas(windowWidth, windowHeight);
 
   nano = new NanoKontrol2({
-    statusLabel: true,
+    statusLabel: true, // show the device connection status in the top-left corner of the page
   });
 
   // PLAY/STOP are a radio group: exactly one is active, and its LED lights
@@ -50,7 +36,7 @@ function setup() {
   // REC_n latches a creature asleep; the LED lights to match its toggled state.
   for (let i = 0; i < CHANNELS; i++) nano.setType(`REC_${i + 1}`, 'toggle');
 
-  for (let i = 0; i < CHANNELS; i++) characters.push(new Character(i, nano));
+  for (let i = 0; i < CHANNELS; i++) characters.push(new Character(i));
 
   // nano.smoothMode('easeOut', 400);
 }
@@ -58,10 +44,36 @@ function setup() {
 function draw() {
   background("#7dde65");
 
+  // Feed each character its current control state, then draw it.
   const slotWidth = width / CHANNELS;
   for (const character of characters) {
+    const i = character.index + 1; // 1-based channel for control names
+
+    character.solo = nano.isPressed(`SOLO_${i}`);
+    character.mute = nano.isPressed(`MUTE_${i}`);
+    character.sleeping = !nano.isToggled(PLAY) || nano.isToggled(`REC_${i}`);
+    
     character.draw(slotWidth);
   }
+}
+
+function controlChanged(control) {
+  for (const character of characters) {
+    const i = character.index + 1; // 1-based channel for control names
+    if (control === `KNOB_${i}`) {
+      character.hueShift = nano.value * 360;
+    }
+    if (control === `SLIDER_${i}`) {
+      character.slider = nano.value;
+    }
+  }
+}
+
+function buttonPressed(btn) {
+  if (btn === NEXT_MARKER) offsetColor(-1);
+  if (btn === PREV_MARKER) offsetColor(1);
+  if (btn === PREV_TRACK) offsetPalette(-1);
+  if (btn === NEXT_TRACK) offsetPalette(1);
 }
 
 function windowResized() {
@@ -72,31 +84,4 @@ function keyPressed() {
   if (key === 'f' || key === 'F') {
     fullscreen(!fullscreen());
   }
-}
-
-function controlChanged(control) {
-  for (const character of characters) {
-    if (control === `KNOB_${character.ch}`) {
-      character.setKnob(nano.value);
-    }
-  }
-}
-
-function buttonPressed(btn) {
-  for (const character of characters) character.setHeld(btn, true);
-
-  if (btn === NEXT_MARKER) paletteOffset = ((paletteOffset - 1) % palettes[paletteIndex].length + palettes[paletteIndex].length) % palettes[paletteIndex].length;
-  if (btn === PREV_MARKER) paletteOffset = (paletteOffset + 1) % palettes[paletteIndex].length;
-  if (btn === PREV_TRACK) {
-    paletteIndex = ((paletteIndex - 1) % palettes.length + palettes.length) % palettes.length;
-    paletteOffset = 0;
-  }
-  if (btn === NEXT_TRACK) {
-    paletteIndex = (paletteIndex + 1) % palettes.length;
-    paletteOffset = 0;
-  }
-}
-
-function buttonReleased(btn) {
-  for (const character of characters) character.setHeld(btn, false);
 }

@@ -1,35 +1,19 @@
 // A single bouncing creature tied to one nanoKONTROL2 channel.
 // Owns its eased motion/energy state and knows how to draw itself.
 class Character {
-  constructor(index, nano) {
+  constructor(index) {
     this.index = index;       // 0-based channel index
-    this.nano = nano;
-    this.ch = index + 1;      // 1-based channel for control names
 
-    // Held-button state, tracked from buttonPressed/buttonReleased.
-    this.solo = false;
-    this.mute = false;
-    this.hueShift = 0; // degrees, from the knob
+    // Input state, set by the sketch from nanoKONTROL2 controls.
+    this.solo = false;     // SOLO held
+    this.mute = false;     // MUTE held
+    this.sleeping = false; // asleep (STOP/REC) vs awake (PLAY)
+    this.slider = 0.5;     // resting height, 0..1
+    this.hueShift = 0;     // degrees, from the knob
 
     // Eased state so transitions are smooth.
     this.energy = 1;   // 1 awake & bouncing, 0 asleep
     this.charY = null; // current eased vertical position
-  }
-
-  // True while soloing or while falling asleep.
-  get sleeping() {
-    return !this.nano.isToggled(PLAY) || this.nano.isToggled(`REC_${this.ch}`);
-  }
-
-  // Update the per-channel held state for SOLO/MUTE and mirror on LEDs.
-  setHeld(btn, on) {
-    if (btn === `SOLO_${this.ch}`) { this.solo = on; this.nano.setLed(`SOLO_${this.ch}`, on); }
-    if (btn === `MUTE_${this.ch}`) { this.mute = on; this.nano.setLed(`MUTE_${this.ch}`, on); }
-  }
-
-  // Shift this character's hue from its knob value.
-  setKnob(value) {
-    this.hueShift = value * 360;
   }
 
   draw(slotWidth) {
@@ -37,7 +21,7 @@ class Character {
     const cx = slotWidth * (i + 0.5);
 
     // Slider sets the resting height: 1 -> high, 0 -> low.
-    const slider = this.nano.getValue(`SLIDER_${this.ch}`, { defaultValue: 0.5 });
+    const slider = this.slider;
 
     const sleeping = this.sleeping;
 
