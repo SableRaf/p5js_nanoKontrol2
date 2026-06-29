@@ -8,7 +8,7 @@ More about the nanoKONTROL2 on the [Korg website](https://www.korg.com/us/produc
 
 ## Demo
 
-If you already have a nanoKONTROL2, you can try the demo sketch on OpenProcessing:
+You can try the demo sketch on OpenProcessing:
 
 https://openprocessing.org/@SableRaph/2973319
 
@@ -16,16 +16,14 @@ https://openprocessing.org/@SableRaph/2973319
 
 ## Quick start
 
-Add the scripts to your HTML after p5.js and WebMidi.js:
+Import webMidi.js and p5.nanokontrol2 in your HTML:
 
 ```html
 <script src="https://cdn.jsdelivr.net/npm/webmidi@3/dist/iife/webmidi.iife.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/p5@2.3.0/lib/p5.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/p5.nanokontrol2@0.1.1/dist/p5.nanokontrol2.js"></script>
-<script src="sketch.js"></script>
 ```
 
-Create a `NanoKontrol2` instance in `setup()`, then define callback functions to respond to controls.
+Then, in your sketch, create a `NanoKontrol2` instance in `setup()`, then define callback functions to respond to controls.
 
 Here is a minimal code example:
 
