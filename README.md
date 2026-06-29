@@ -82,9 +82,7 @@ External LED control only works when the nanoKONTROL2's **LED Mode is set to "Ex
 
 ### MIDI configuration
 
-The library also assumes that the nanoKONTROL2 is set to its default MIDI configuration.
-
-If you have changed the cc numbers, channels, range, or any other settings, the library may not work as expected.
+The library also assumes that the nanoKONTROL2 is set to its default MIDI configuration. If you have previously changed the built-in settings using the Korg KONTROL Editor, the library may not work as expected.
 
 To restore the factory settings, press and hold the PREV TRACK button, NEXT TRACK button, and CYCLE button simultaneously while connecting the USB cable to the nanoKONTROL2. The transport buttons except the CYCLE button will then blink.
 
@@ -123,6 +121,14 @@ Large parts of this project's code and documentation were written or edited with
 - [WebMidi.js](https://webmidijs.org/) is the underlying library that handles MIDI input/output
 - [p5.js](https://p5js.org/)
 - [OpenProcessing](https://openprocessing.org/)
+
+## Official Korg nanoKONTROL2 resources
+
+- [Korg KONTROL Editor](https://www.korg.com/us/support/download/software/1/133/1355/)
+- [Korg nanoKONTROL2 Parameter Guide](https://cdn.korg.com/us/support/download/files/c8d0cd6808e12d3672845cadcdbbfe9b.pdf)
+- [Korg nanoKONTROL2 Owner's Manual](https://www.korg.com/us/support/download/manual/0/159/1912/)
+- [Korg nanoKONTROL2 MIDI Implementation Chart](https://cdn.korg.com/us/support/download/files/aeb2862daf0cb7db826d8c62f51ec28d.txt)
+- [Korg nanoKONTROL2 product page](https://www.korg.com/us/products/computergear/nanokontrol2/)
 
 ## License
 
