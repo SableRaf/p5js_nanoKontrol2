@@ -113,7 +113,7 @@ If you want to use a different MIDI controller with p5.js, you can use [WebMidi.
 
 ## AI Disclosure
 
-Large parts of this project's code and documentation were written or edited with the help of LLM-based tools including Claude Code and GitHub Copilot. A real human (me, [@SableRaf](https://github.com/SableRaf)) has tested the code and verified that everything works as described.
+Large parts of this project's code and documentation were written or edited with the help of LLM-based tools including Claude Code and GitHub Copilot. A real human (me, [@SableRaf](https://github.com/SableRaf)) made all the design decisions, tested the code, and verified that everything works as described.
 
 ## Acknowledgements
 
