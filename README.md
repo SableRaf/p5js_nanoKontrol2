@@ -13,7 +13,7 @@ More about the nanoKONTROL2 on the [Korg website](https://www.korg.com/us/produc
 
 ## Try it
 
-[Demo sketch](https://openprocessing.org/@SableRaph/2973319) (you will need a nanoKONTROL2 connected to your computer).
+[Demo sketch](https://openprocessing.org/@SableRaph/2973319) (you will need a nanoKONTROL2 connected to your computer)
 
 ![Demo screenshot](https://raw.githubusercontent.com/SableRaf/p5js_nanoKontrol2/main/demo.png)
 
