@@ -7,6 +7,8 @@ A p5.js addon library for the Korg nanoKONTROL2 MIDI controller.
 
 ![Layout of the nanoKONTROL2](https://raw.githubusercontent.com/SableRaf/p5js_nanoKontrol2/main/examples/demos/digitalTwin/layout.svg)
 
+Using a physical device is a fun alternative to a mouse, keyboard, or on-screen UI. The nanoKONTROL2 has 8 sliders, 8 knobs, and 35 buttons, 30 of which have built-in LEDs. You can map these to control any variable in your p5.js sketch, the size of a shape, the speed of an animation, or the color of a background. It's all up to you!
+
 More about the nanoKONTROL2 on the [Korg website](https://www.korg.com/us/products/computergear/nanokontrol2/).
 
 ## Try it
@@ -16,6 +18,9 @@ More about the nanoKONTROL2 on the [Korg website](https://www.korg.com/us/produc
 ![Demo screenshot](https://raw.githubusercontent.com/SableRaf/p5js_nanoKontrol2/main/demo.png)
 
 ## Quick start
+
+> [!NOTE]
+> The instructions below show basic usage. For the full API docs, see [API.md](API.md).
 
 Import webMidi.js and p5.nanokontrol2 in your HTML:
 
@@ -87,10 +92,6 @@ For the library to work, the nanoKONTROL2 needs to be in **CC mode** with **Exte
 
 For more details, see the Korg nanoKONTROL2 [Owner's Manual](https://www.korg.com/us/support/download/manual/0/159/1912/) and [Parameter Guide](https://cdn.korg.com/us/support/download/files/c8d0cd6808e12d3672845cadcdbbfe9b.pdf).
 
-## Documentation
-
-For the full API docs, see [API.md](API.md).
-
 ## Building from source
 
 ```bash
@@ -102,14 +103,25 @@ npm run watch       # rebuild on change
 
 ## Frequently asked questions
 
-### Why does it only work with the nanoKONTROL2?
+### Is this for making music?
 
-I have a [Korg nanoKONTROL2](https://www.korg.com/us/products/computergear/nanokontrol2/) and I wanted to use it in my p5.js sketches :)
+No (unless you want it to be).
+
+Although MIDI controllers are often used for music production, this library is not audio-specific. It lets you use the controller's sliders, knobs, buttons, and LEDs as input and output devices for any p5.js sketch.
+
+For example, you could use a slider to control the speed of an animation or the size of an object, or use toggle buttons to switch different effects on and off. It's all up to you.
+
+If you want to use p5.js for audio, check out [p5.sound](https://p5js.org/reference/p5.sound/) or [tone.js](https://tonejs.github.io/).
+
+### Is this library compatible with other MIDI controllers?
+
+No.
+
+The [Korg nanoKONTROL2](https://www.korg.com/us/products/computergear/nanokontrol2/) is the only MIDI controller I own, and I wanted to use it in my p5.js sketches :)
 
 This is also a choice to keep the project scope small.
 
 If you want to use a different MIDI controller with p5.js, you can use [WebMidi.js v3](https://webmidijs.org/) directly.
-
 
 ## AI Disclosure
 
