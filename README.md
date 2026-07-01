@@ -35,8 +35,19 @@ Then, in `setup()`, create a `NanoKontrol2` instance:
 nano = new NanoKontrol2() 
 ```
 
-Use the callback functions to respond to inputs. The triggering control's name is
-passed as the first argument, so you can compare it directly:
+You can access button states directly in `draw()` with `getValue()` or `isPressed()`:
+
+```js
+nano.getValue(SLIDER_1) // <-- returns a value between 0 and 1
+```
+
+```js
+nano.isPressed(REC_2) // <-- returns true or false
+```
+
+Use the callback functions `buttonPressed` and `buttonReleased` to capture button events. These work similarly to p5.js's `mousePressed()` or `keyPressed()` functions. 
+
+For example:
 
 ```js
 function buttonPressed(btn) {
@@ -46,10 +57,14 @@ function buttonPressed(btn) {
 }
 ```
 
-Or access input value directly with `getValue()`:
+For sliders and knobs, use `controlChanged`:
 
 ```js
-nano.getValue(SLIDER_1)
+function controlChanged(ctrl) {
+  if (ctrl === KNOB_1) {
+    background(nano.getValue(KNOB_1) * 255);
+  }
+}
 ```
 
 ### Minimal example
@@ -81,7 +96,7 @@ For the library to work, the nanoKONTROL2 needs to be in **CC mode** with **Exte
 
 1. **Restore factory settings** (only needed if you've previously changed settings with the KORG KONTROL Editor). Hold down the PREV TRACK, NEXT TRACK, and CYCLE buttons while connecting the USB cable. The transport buttons, except CYCLE, will blink.
 
-2. **Enable CC mode.** Hold down the SET MARKER and CYCLE buttons while connecting the USB cable. (The library does not work in the default "DAW mode".)
+2. **Enable CC mode.** Hold down the SET MARKER and CYCLE buttons while connecting the USB cable.
 
 3. **Set LED Mode to "External".** Open the [KORG KONTROL Editor](https://www.korg.com/us/support/download/software/1/133/1355/), go to the Control tab, select "Common", and set LED Mode to "External". This is required for external LED control to work.
 
