@@ -52,11 +52,6 @@ Or access input value directly with `getValue()`:
 nano.getValue(SLIDER_1)
 ```
 
-> [!NOTE]
-> All buttons default to **momentary**: they fire `buttonPressed`/`buttonReleased`
-> while held. Make a button latching (`'toggle'`) or mutually exclusive (`'radio'`)
-> with [`setType`](API.md#settypename-type).
-
 ### Minimal example
 
 ```js
